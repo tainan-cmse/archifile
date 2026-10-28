@@ -112,7 +112,7 @@ ol.steps li.done .n{background:var(--ink);color:var(--paper-2)}
         <h1>三眼綴訂<br>穿線挑戰</h1>
         <span class="en">Three-Hole Stab Binding</span>
       </div>
-      <p>檔案修護完成後，要用三眼綴訂把卷宗重新裝訂起來。拿起針線，照著順序穿過上、中、下三個孔，繞過書背、翻面打結，最後把線結藏進孔裡。</p>
+      <p>檔案修護完成後，要用三眼綴訂把卷宗重新裝訂起來。拿起針線，照著順序在上、中、下三個孔之間上下穿梭，翻面打結，最後把線結藏進孔裡。</p>
       <div class="chips"><span>8 個步驟</span><span>3 種工具</span><span>手機也能玩</span></div>
       <div><button class="btn big" id="startBtn">開始穿線</button></div>
     </div>
@@ -140,7 +140,7 @@ ol.steps li.done .n{background:var(--ink);color:var(--paper-2)}
       </div>
 
       <div class="stage" id="stage">
-        <svg id="book" viewBox="0 0 400 480" role="img" aria-label="交通部卷宗，可點孔位與書背">
+        <svg id="book" viewBox="0 0 400 480" role="img" aria-label="交通部卷宗，可點上中下三個孔位">
           <defs>
             <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".9" fill="#1b1714" fill-opacity=".10"/></pattern>
             <clipPath id="coverClip"><rect x="32" y="32" width="222" height="416"/></clipPath>
@@ -196,9 +196,9 @@ const NAME = {up:'上孔', mid:'中孔', down:'下孔'};
 const TOOLNAME = {needle:'針線', scissors:'剪刀', awl:'錐子'};
 const STEPS = [
   '針由「中孔」穿出，背面留線尾',
-  '穿入「上孔」，線繞過書背',
+  '穿入「上孔」',
   '由背面拉到「下孔」穿出',
-  '繞過書背，再穿入「中孔」',
+  '再穿入「中孔」',
   '翻到背面，線頭與線尾打結',
   '剪去多餘的線',
   '用錐子把線結推入孔中',
@@ -208,10 +208,8 @@ const STEPS = [
 const ACTIONS = [
   {step:0, target:'mid',   side:'front', tool:'needle', task:'把針從背面推出來，點正面的「中孔」。'},
   {step:1, target:'up',    side:'front', tool:'needle', task:'把針穿入「上孔」。'},
-  {step:1, target:'spine', side:'front', tool:'needle', task:'在上孔的高度讓線繞過書背，點右側書背。'},
-  {step:2, target:'down',  side:'front', tool:'needle', task:'線在背面往下拉，從「下孔」穿出。'},
-  {step:3, target:'spine', side:'front', tool:'needle', task:'在下孔的高度再繞一次書背，點右側書背。'},
-  {step:3, target:'mid',   side:'front', tool:'needle', task:'最後一針，穿入「中孔」。'},
+  {step:2, target:'down',  side:'front', tool:'needle', task:'線在背面沿著直線往下拉，從「下孔」穿出。'},
+  {step:3, target:'mid',   side:'front', tool:'needle', task:'線在正面往上回到中間，穿入「中孔」。'},
   {step:4, target:'flip',  side:'front', tool:null,     task:'線頭到背面了，按「翻面」。'},
   {step:4, target:'mid',   side:'back',  tool:'needle', task:'把線頭和線尾在「中孔」拉緊打結。'},
   {step:5, target:'mid',   side:'back',  tool:'scissors', task:'換剪刀，剪掉中孔多餘的線。'},
@@ -238,14 +236,12 @@ function apply(a){
   switch(st.i){
     case 0: st.mark={at:'mid',type:'out',side:'front'}; st.needle={side:'front',at:'mid'}; break;
     case 1: add('front',`M${HX} ${Y.mid}V${Y.up}`); st.mark={at:'up',type:'in',side:'front'}; st.needle={side:'back',at:'up'}; break;
-    case 2: add('back',`M${HX} ${Y.up}H${EDGE}`); add('front',`M${EDGE} ${Y.up}H${HX}`); st.mark={at:'up',type:'in',side:'front'}; st.needle={side:'back',at:'up'}; break;
-    case 3: add('back',`M${HX} ${Y.up}V${Y.down}`); st.mark={at:'down',type:'out',side:'front'}; st.needle={side:'front',at:'down'}; break;
-    case 4: add('front',`M${HX} ${Y.down}H${EDGE}`); add('back',`M${EDGE} ${Y.down}H${HX}`); st.mark={at:'down',type:'out',side:'front'}; st.needle={side:'front',at:'down'}; break;
-    case 5: add('front',`M${HX} ${Y.down}V${Y.mid}`); st.mark={at:'mid',type:'in',side:'front'}; st.needle={side:'back',at:'mid'}; break;
-    case 6: break;
-    case 7: st.knot='tied'; st.mark=null; break;
-    case 8: st.knot='cut'; break;
-    case 9: st.knot='hidden'; st.needle=null; break;
+    case 2: add('back',`M${HX} ${Y.up}V${Y.down}`); st.mark={at:'down',type:'out',side:'front'}; st.needle={side:'front',at:'down'}; break;
+    case 3: add('front',`M${HX} ${Y.down}V${Y.mid}`); st.mark={at:'mid',type:'in',side:'front'}; st.needle={side:'back',at:'mid'}; break;
+    case 4: break;
+    case 5: st.knot='tied'; st.mark=null; break;
+    case 6: st.knot='cut'; break;
+    case 7: st.knot='hidden'; st.needle=null; break;
   }
   st.last = st.segs.length;
   st.i++;
@@ -276,7 +272,7 @@ function attempt(target){
 }
 
 function hintText(a){
-  return {mid:'看看「中」的位置。', up:'線要往上走。', down:'線在背面往下走到最下面那孔。', spine:'線要繞過右側的書背。'}[a.target] || '';
+  return {mid:'看看「中」的位置。', up:'線要往上走。', down:'線在背面往下走到最下面那孔。',}[a.target] || '';
 }
 
 function miss(text){
@@ -329,7 +325,7 @@ function render(){
   const newest = st.segs.length - 1;
   st.segs.forEach((s, idx) => {
     if (s.side === me){
-      const active = idx === newest && st.i <= 6;
+      const active = idx === newest && st.i <= 4;
       el('path',{d:s.d, stroke:'#1b1714', 'stroke-width':9, 'stroke-linecap':'round', fill:'none'}, th);
       const p = el('path',{d:s.d, stroke: active ? 'var(--thread)' : '#fbf8f1', 'stroke-width':5.5, 'stroke-linecap':'round', fill:'none', pathLength:1}, th);
       if (idx >= st.drawnUpTo) p.classList.add('drawn');
@@ -344,7 +340,7 @@ function render(){
     if (st.knot === 'none'){
       el('path',{d:`M${HX} ${Y.mid} q-30 20 -70 34`, stroke:'#1b1714','stroke-width':8,'stroke-linecap':'round',fill:'none'}, th);
       el('path',{d:`M${HX} ${Y.mid} q-30 20 -70 34`, stroke:'#fbf8f1','stroke-width':4.5,'stroke-linecap':'round',fill:'none'}, th);
-      if (st.i >= 6){
+      if (st.i >= 4){
         el('path',{d:`M${HX} ${Y.mid} q-30 -20 -70 -34`, stroke:'#1b1714','stroke-width':8,'stroke-linecap':'round',fill:'none'}, th);
         el('path',{d:`M${HX} ${Y.mid} q-30 -20 -70 -34`, stroke:'var(--thread)','stroke-width':4.5,'stroke-linecap':'round',fill:'none'}, th);
       }
@@ -370,7 +366,7 @@ function render(){
   // needle
   const away = $('needleAway');
   away.hidden = true;
-  if (st.needle && st.i < 7){
+  if (st.needle && st.i < 5){
     if (st.needle.side === me){
       const y = Y[st.needle.at];
       el('path',{d:`M${HX+4} ${y-3} L${HX+62} ${y-44}`, stroke:'#1b1714','stroke-width':3,'stroke-linecap':'round'}, th);
@@ -392,8 +388,6 @@ function render(){
 
   // hit targets
   const hits = $('hits'); hits.innerHTML = '';
-  const spine = el('g',{class:'hit', tabindex:0, role:'button', 'aria-label':'書背', 'data-t':'spine'}, hits);
-  el('rect',{class:'ring', x:326, y:32, width:40, height:416, rx:8, fill:'transparent'}, spine);
   for (const k of ['up','mid','down']){
     const g = el('g',{class:'hit', tabindex:0, role:'button', 'aria-label':NAME[k], 'data-t':k}, hits);
     el('circle',{class:'ring', cx:HX, cy:Y[k], r:20}, g);
@@ -409,7 +403,7 @@ function render(){
     c.innerHTML = `<svg width="64" height="64" viewBox="0 0 64 64"><path d="M12 34l14 14 26-30" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div class="title"><span>裝訂完成</span></div><div class="rank">${rank}</div>
       <p>失誤 ${st.miss} 次　提示 ${st.hints} 次　用時 ${fmt(secs)}</p>
-      <p>翻回正面看看：上、下兩處繞過書背，中間一條直線。</p>`;
+      <p>翻回正面看看：線沿著上、中、下三孔連成一條直線。</p>`;
     const again = document.createElement('button'); again.className='btn'; again.textContent='再玩一次'; again.onclick = reset;
     c.appendChild(again);
     stage.appendChild(c);
