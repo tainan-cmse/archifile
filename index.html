@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>三眼綴訂穿線挑戰</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<style>
+/* Layout: workbench — the book on a desk mat at left, the binding card (steps) at right; stacks on phones */
+:root{
+  --bg:#f3efe6; --surface:#fffdf8; --ink:#2b2420; --muted:#6f6359; --line:#d9cfc0;
+  --thread:#e0542e; --teal:#14958f; --blue:#2c7fc0; --ok:#2f9a55;
+  --kraft:#c9a173; --kraft-dk:#8a6643; --backcover:#eadcc0; --pages:#f6f1e4; --mat:#e4dccd;
+  --f-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1d1916; --surface:#28221e; --ink:#f1e9dd; --muted:#b6a898; --line:#43392f;
+  --thread:#f06a43; --teal:#3cc1b9; --blue:#67aee6; --ok:#55c27c; --mat:#332b24; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1d1916; --surface:#28221e; --ink:#f1e9dd; --muted:#b6a898; --line:#43392f;
+  --thread:#f06a43; --teal:#3cc1b9; --blue:#67aee6; --ok:#55c27c; --mat:#332b24; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(26px,5vw,38px);margin:0;letter-spacing:.04em;text-wrap:balance}
+header .en{color:var(--blue);font-size:15px;letter-spacing:.02em}
+header .stats{margin-left:auto;display:flex;gap:14px;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+header .stats b{color:var(--ink)}
+.main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:760px){.main{grid-template-columns:1fr}}
+.bench{background:var(--mat);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar .lbl{font-size:13px;color:var(--muted);letter-spacing:.08em}
+.tool,.btn{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;padding:6px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tool[aria-pressed="true"]{border-color:var(--thread);background:var(--thread);color:#fff}
+.tool svg{width:18px;height:18px}
+.btn.flip{border-color:var(--ink);font-weight:700}
+.btn:focus-visible,.tool:focus-visible,.hit:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.spacer{flex:1}
+.stage{position:relative;max-width:100%;aspect-ratio:400/480;margin:0 auto;width:min(100%,460px);perspective:1200px}
+#book{width:100%;height:100%;display:block;transition:transform .28s ease-in}
+#book.flipping{transform:rotateY(90deg)}
+.side-tag{position:absolute;top:10px;left:10px;font-weight:700;font-size:14px;color:#fff;background:var(--blue);padding:2px 12px;border-radius:999px}
+.side-tag.back{background:#3a332d;left:auto;right:10px}
+.needle-away{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:13px;background:var(--surface);color:var(--muted);
+  border:1px dashed var(--line);border-radius:8px;padding:2px 10px;white-space:nowrap}
+.msg{min-height:3.2em;background:var(--surface);border-radius:10px;padding:10px 14px;border-left:5px solid var(--teal);font-size:15px}
+.msg.bad{border-left-color:var(--thread)}
+.msg.good{border-left-color:var(--ok)}
+.msg .task{font-weight:700}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h2{font-family:var(--f-display);font-size:19px;margin:0}
+ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+ol.steps li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;color:var(--muted)}
+ol.steps .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;border:1.5px solid var(--line);font-variant-numeric:tabular-nums}
+ol.steps li.now{background:color-mix(in srgb,var(--blue) 12%,transparent);color:var(--ink);font-weight:700}
+ol.steps li.now .n{background:var(--blue);border-color:var(--blue);color:#fff}
+ol.steps li.done{color:var(--ink)}
+ol.steps li.done .n{background:var(--teal);border-color:var(--teal);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.facts{font-size:13.5px;color:var(--muted);margin:0;display:flex;flex-direction:column;gap:4px}
+.facts b{color:var(--blue);font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.hit{cursor:pointer}
+.hit:hover .ring{stroke:var(--blue);stroke-opacity:.9}
+.ring{fill:transparent;stroke:transparent;stroke-width:3}
+.pulse{animation:pulse 1s ease-in-out 3}
+@keyframes pulse{50%{stroke:var(--blue);stroke-opacity:1;stroke-width:6}}
+.btn.pulse,.tool.pulse{animation:pbtn 1s ease-in-out 3}
+@keyframes pbtn{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--blue) 45%,transparent)}}
+.drawn{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .55s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.done-card{position:absolute;inset:8% 6%;background:var(--surface);border:2px solid var(--ok);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.done-card .title{font-family:var(--f-display);font-size:26px;font-weight:900}
+.done-card .rank{font-size:18px;color:var(--teal);font-weight:700}
+.done-card p{margin:0;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>三眼綴訂穿線挑戰</h1>
+    <span class="en">Three-Hole Stab Binding</span>
+    <div class="stats"><span>失誤 <b id="sMiss">0</b></span><span>提示 <b id="sHint">0</b></span><span>時間 <b id="sTime">0:00</b></span></div>
+  </header>
+
+  <div class="main">
+    <section class="bench" aria-label="操作台">
+      <div class="toolbar">
+        <span class="lbl">工具</span>
+        <button class="tool" id="t-needle" data-tool="needle" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20 19 5"/><ellipse cx="19.5" cy="4.5" rx="1.6" ry="2.6" transform="rotate(45 19.5 4.5)"/></svg>針線</button>
+        <button class="tool" id="t-scissors" data-tool="scissors" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M8.5 7.5 20 18M8.5 16.5 20 6"/></svg>剪刀</button>
+        <button class="tool" id="t-awl" data-tool="awl" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 21 13 11"/><path d="m13 11 3-3 5 1-1 4-4 1-3-3Z" fill="currentColor"/></svg>錐子</button>
+        <span class="spacer"></span>
+        <button class="btn flip" id="flipBtn">翻面</button>
+      </div>
+
+      <div class="stage" id="stage">
+        <svg id="book" viewBox="0 0 400 480" role="img" aria-label="檔案書冊，可點孔位與書背">
+          <defs>
+            <pattern id="grain" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 3h6" stroke="#000" stroke-opacity=".035"/></pattern>
+          </defs>
+          <g id="mirror">
+            <!-- book geometry, front coordinates; back view mirrors around x=188 -->
+            <rect x="30" y="30" width="302" height="420" rx="6" id="cover" fill="#c9a173" stroke="#5a3d24" stroke-width="2"/>
+            <rect x="30" y="30" width="302" height="420" rx="6" fill="url(#grain)"/>
+            <line x1="250" y1="34" x2="250" y2="446" stroke="#5a3d24" stroke-opacity=".25" stroke-width="1.5"/>
+            <rect x="332" y="34" width="16" height="412" fill="#f6f1e4" stroke="#5a3d24" stroke-width="1.5"/>
+            <g stroke="#5a3d24" stroke-opacity=".25"><line x1="337" y1="36" x2="337" y2="444"/><line x1="342" y1="36" x2="342" y2="444"/></g>
+            <g id="holes"></g>
+            <g id="otherThread" opacity=".55"></g>
+            <g id="thread"></g>
+            <g id="marks"></g>
+            <g id="hits"></g>
+          </g>
+          <g id="labels" font-family="Noto Sans TC, sans-serif" font-size="17" fill="#3d2b1c" opacity=".75"></g>
+        </svg>
+        <span class="side-tag" id="sideTag">正面</span>
+        <span class="needle-away" id="needleAway" hidden></span>
+      </div>
+
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+      <div class="row">
+        <button class="btn" id="hintBtn">給我提示</button>
+        <button class="btn" id="resetBtn">重新開始</button>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2>穿線步驟</h2>
+      <ol class="steps" id="steps"></ol>
+      <div class="legend">
+        <span><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="#fff" stroke="#e0542e" stroke-width="2.5"/><circle cx="10" cy="10" r="2.6" fill="#e0542e"/></svg>穿出</span>
+        <span><svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="#fff" stroke="#e0542e" stroke-width="2.5"/><path d="M6.5 6.5l7 7M13.5 6.5l-7 7" stroke="#e0542e" stroke-width="2.3"/></svg>穿入</span>
+        <span><svg width="26" height="10" viewBox="0 0 26 10"><path d="M1 5h24" stroke="currentColor" stroke-width="3" stroke-dasharray="5 4"/></svg>另一面的線</span>
+      </div>
+      <div class="facts">
+        <div><b>孔位</b> 距書背 1–1.5 公分處先定中孔，再向上、向下各取一點，成一直線三孔。</div>
+        <div><b>線長</b> 約為上下兩孔距離的 6 倍。檔案厚度以 3 公分為限。</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+const HX = 292, EDGE = 349, Y = {up:130, mid:240, down:350};
+const NAME = {up:'上孔', mid:'中孔', down:'下孔'};
+const TOOLNAME = {needle:'針線', scissors:'剪刀', awl:'錐子'};
+const STEPS = [
+  '針由「中孔」穿出，背面留線尾',
+  '穿入「上孔」，線繞過書背',
+  '由背面拉到「下孔」穿出',
+  '繞過書背，再穿入「中孔」',
+  '翻到背面，線頭與線尾打結',
+  '剪去多餘的線',
+  '用錐子把線結推入孔中',
+  '完成：線結藏入中孔'
+];
+// Each action: what to click, on which side, with which tool, and which numbered step it belongs to.
+const ACTIONS = [
+  {step:0, target:'mid',   side:'front', tool:'needle', task:'把針從背面推出來，點正面的「中孔」。'},
+  {step:1, target:'up',    side:'front', tool:'needle', task:'把針穿入「上孔」。'},
+  {step:1, target:'spine', side:'front', tool:'needle', task:'在上孔的高度讓線繞過書背，點右側書背。'},
+  {step:2, target:'down',  side:'front', tool:'needle', task:'線在背面往下拉，從「下孔」穿出。'},
+  {step:3, target:'spine', side:'front', tool:'needle', task:'在下孔的高度再繞一次書背，點右側書背。'},
+  {step:3, target:'mid',   side:'front', tool:'needle', task:'最後一針，穿入「中孔」。'},
+  {step:4, target:'flip',  side:'front', tool:null,     task:'線頭到背面了，按「翻面」。'},
+  {step:4, target:'mid',   side:'back',  tool:'needle', task:'把線頭和線尾在「中孔」拉緊打結。'},
+  {step:5, target:'mid',   side:'back',  tool:'scissors', task:'換剪刀，剪掉中孔多餘的線。'},
+  {step:6, target:'mid',   side:'back',  tool:'awl',   task:'換錐子，把線結推進中孔藏起來。'}
+];
+const $ = id => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+let st;
+
+function fresh(){
+  return {i:0, view:'front', tool:'needle', miss:0, hints:0, t0:null, tEnd:null,
+          segs:[], mark:null, needle:{side:'back', at:'mid'}, knot:'none', last:-1};
+}
+
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+function apply(a){
+  const add = (side, d) => st.segs.push({side, d, n: st.segs.length});
+  switch(st.i){
+    case 0: st.mark={at:'mid',type:'out',side:'front'}; st.needle={side:'front',at:'mid'}; break;
+    case 1: add('front',`M${HX} ${Y.mid}V${Y.up}`); st.mark={at:'up',type:'in',side:'front'}; st.needle={side:'back',at:'up'}; break;
+    case 2: add('back',`M${HX} ${Y.up}H${EDGE}`); add('front',`M${EDGE} ${Y.up}H${HX}`); st.mark={at:'up',type:'in',side:'front'}; st.needle={side:'back',at:'up'}; break;
+    case 3: add('back',`M${HX} ${Y.up}V${Y.down}`); st.mark={at:'down',type:'out',side:'front'}; st.needle={side:'front',at:'down'}; break;
+    case 4: add('front',`M${HX} ${Y.down}H${EDGE}`); add('back',`M${EDGE} ${Y.down}H${HX}`); st.mark={at:'down',type:'out',side:'front'}; st.needle={side:'front',at:'down'}; break;
+    case 5: add('front',`M${HX} ${Y.down}V${Y.mid}`); st.mark={at:'mid',type:'in',side:'front'}; st.needle={side:'back',at:'mid'}; break;
+    case 6: break;
+    case 7: st.knot='tied'; st.mark=null; break;
+    case 8: st.knot='cut'; break;
+    case 9: st.knot='hidden'; st.needle=null; break;
+  }
+  st.last = st.segs.length;
+  st.i++;
+}
+
+function attempt(target){
+  if (st.i >= ACTIONS.length) return;
+  if (st.t0 === null) st.t0 = Date.now();
+  const a = ACTIONS[st.i];
+  if (target === 'flip'){
+    if (a.target === 'flip'){ doFlip(() => { apply(a); say(`翻到背面了。線頭從中孔出來，正好和線尾在一起。`, 'good'); render(); }); }
+    else doFlip(() => render(), true);
+    return;
+  }
+  if (a.target === 'flip'){ miss(`線頭已經穿到背面了，先按「翻面」看看背面。`); return; }
+  if (st.view !== a.side){ miss(a.side === 'front' ? '這一步要在正面操作，先翻回正面。' : '這一步要在背面操作，先翻到背面。'); return; }
+  if (target !== a.target){
+    const want = a.target === 'spine' ? '書背' : NAME[a.target];
+    const got = target === 'spine' ? '書背' : NAME[target];
+    miss(`不是${got}喔。${hintText(a)}（目標：${want}）`); return;
+  }
+  if (a.tool && st.tool !== a.tool){ miss(`位置對了，但這一步要用「${TOOLNAME[a.tool]}」。`); return; }
+  apply(a);
+  const done = st.i >= ACTIONS.length;
+  if (done){ st.tEnd = Date.now(); }
+  say(done ? '完成！線結藏進中孔，書冊裝訂好了。' : '對了！', 'good');
+  render();
+}
+
+function hintText(a){
+  return {mid:'看看「中」的位置。', up:'線要往上走。', down:'線在背面往下走到最下面那孔。', spine:'線要繞過右側的書背。'}[a.target] || '';
+}
+
+function miss(text){
+  st.miss++;
+  say(text, 'bad');
+  const s = $('stage'); s.classList.remove('shake'); void s.offsetWidth; s.classList.add('shake');
+  updateStats();
+}
+
+function say(text, kind){
+  const a = ACTIONS[st.i];
+  const m = $('msg');
+  m.className = 'msg' + (kind ? ' ' + kind : '');
+  m.innerHTML = '';
+  const p1 = document.createElement('div'); p1.textContent = text; m.appendChild(p1);
+  if (a && kind !== 'bad'){ const p2 = document.createElement('div'); p2.className='task'; p2.textContent = '下一步：' + a.task; m.appendChild(p2); }
+}
+
+function doFlip(after, plain){
+  const b = $('book');
+  b.classList.add('flipping');
+  setTimeout(() => {
+    st.view = st.view === 'front' ? 'back' : 'front';
+    after();
+    if (plain) say(`現在看的是${st.view === 'front' ? '正面' : '背面'}。`);
+    b.classList.remove('flipping');
+  }, 280);
+}
+
+function render(){
+  const back = st.view === 'back';
+  $('mirror').setAttribute('transform', back ? 'translate(376 0) scale(-1 1)' : '');
+  $('cover').setAttribute('fill', back ? '#eadcc0' : '#c9a173');
+  const tag = $('sideTag'); tag.textContent = back ? '背面' : '正面'; tag.className = 'side-tag' + (back ? ' back' : '');
+
+  // holes and labels
+  const holes = $('holes'); holes.innerHTML = '';
+  const labels = $('labels'); labels.innerHTML = '';
+  for (const k of ['up','mid','down']){
+    el('circle',{cx:HX, cy:Y[k], r:6, fill:'#2b1d12'}, holes);
+    const t = el('text',{x: back ? 376-(HX-32)+30 : HX-32, y:Y[k]+6, 'text-anchor':'middle'}, labels);
+    t.textContent = {up:'上',mid:'中',down:'下'}[k];
+  }
+
+  // thread
+  const me = back ? 'back' : 'front';
+  const th = $('thread'); th.innerHTML = '';
+  const ot = $('otherThread'); ot.innerHTML = '';
+  const newest = st.segs.length - 1;
+  st.segs.forEach((s, idx) => {
+    if (s.side === me){
+      const active = idx === newest && st.i <= 6;
+      el('path',{d:s.d, stroke:'#5a3d24', 'stroke-width':9, 'stroke-linecap':'round', fill:'none'}, th);
+      const p = el('path',{d:s.d, stroke: active ? 'var(--thread)' : '#fbf8f1', 'stroke-width':5.5, 'stroke-linecap':'round', fill:'none', pathLength:1}, th);
+      if (idx >= st.drawnUpTo) p.classList.add('drawn');
+    } else {
+      el('path',{d:s.d, stroke:'#5a3d24', 'stroke-width':3, 'stroke-dasharray':'7 6', fill:'none'}, ot);
+    }
+  });
+  st.drawnUpTo = st.segs.length;
+
+  // back-side tails, knot
+  if (back){
+    if (st.knot === 'none'){
+      el('path',{d:`M${HX} ${Y.mid} q-30 20 -70 34`, stroke:'#5a3d24','stroke-width':8,'stroke-linecap':'round',fill:'none'}, th);
+      el('path',{d:`M${HX} ${Y.mid} q-30 20 -70 34`, stroke:'#fbf8f1','stroke-width':4.5,'stroke-linecap':'round',fill:'none'}, th);
+      if (st.i >= 6){
+        el('path',{d:`M${HX} ${Y.mid} q-30 -20 -70 -34`, stroke:'#5a3d24','stroke-width':8,'stroke-linecap':'round',fill:'none'}, th);
+        el('path',{d:`M${HX} ${Y.mid} q-30 -20 -70 -34`, stroke:'var(--thread)','stroke-width':4.5,'stroke-linecap':'round',fill:'none'}, th);
+      }
+    } else if (st.knot === 'tied' || st.knot === 'cut'){
+      const len = st.knot === 'tied' ? 70 : 14;
+      for (const dir of [-1,1]){
+        const d = `M${HX-6} ${Y.mid} l${-len} ${dir*len*0.55}`;
+        el('path',{d, stroke:'#5a3d24','stroke-width':7,'stroke-linecap':'round'}, th);
+        el('path',{d, stroke:'var(--thread)','stroke-width':4,'stroke-linecap':'round'}, th);
+      }
+      el('circle',{cx:HX-4, cy:Y.mid, r:10, fill:'none', stroke:'#5a3d24','stroke-width':7}, th);
+      el('circle',{cx:HX-4, cy:Y.mid, r:10, fill:'none', stroke:'var(--thread)','stroke-width':4}, th);
+      if (st.knot === 'cut'){
+        el('path',{d:`M${HX-34} ${Y.mid-26}v52`, stroke:'var(--thread)','stroke-width':2.5,'stroke-dasharray':'5 4'}, th);
+      }
+    } else if (st.knot === 'hidden'){
+      el('circle',{cx:HX, cy:Y.mid, r:7, fill:'#fbf8f1', stroke:'#5a3d24','stroke-width':2}, th);
+    }
+  } else if (st.needle && st.needle.side === 'back' && st.i === 0) {
+    // nothing on front yet
+  }
+
+  // needle
+  const away = $('needleAway');
+  away.hidden = true;
+  if (st.needle && st.i < 7){
+    if (st.needle.side === me){
+      const y = Y[st.needle.at];
+      el('path',{d:`M${HX+4} ${y-3} L${HX+62} ${y-44}`, stroke:'#5a5f66','stroke-width':3,'stroke-linecap':'round'}, th);
+      el('ellipse',{cx:HX+64, cy:y-46, rx:2.4, ry:5, transform:`rotate(54 ${HX+64} ${y-46})`, fill:'none', stroke:'#5a5f66','stroke-width':2}, th);
+    } else {
+      away.hidden = false;
+      away.textContent = `針目前在${st.needle.side === 'back' ? '背面' : '正面'}的${NAME[st.needle.at]}`;
+    }
+  }
+
+  // in/out mark
+  const marks = $('marks'); marks.innerHTML = '';
+  if (st.mark && st.mark.side === me){
+    const y = Y[st.mark.at];
+    el('circle',{cx:HX, cy:y, r:13, fill:'#fff', stroke:'var(--thread)','stroke-width':3.5}, marks);
+    if (st.mark.type === 'out') el('circle',{cx:HX, cy:y, r:4.5, fill:'var(--thread)'}, marks);
+    else el('path',{d:`M${HX-7} ${y-7}l14 14M${HX+7} ${y-7}l-14 14`, stroke:'var(--thread)','stroke-width':3.2}, marks);
+  }
+
+  // hit targets
+  const hits = $('hits'); hits.innerHTML = '';
+  const spine = el('g',{class:'hit', tabindex:0, role:'button', 'aria-label':'書背', 'data-t':'spine'}, hits);
+  el('rect',{class:'ring', x:326, y:32, width:40, height:416, rx:8, fill:'transparent'}, spine);
+  for (const k of ['up','mid','down']){
+    const g = el('g',{class:'hit', tabindex:0, role:'button', 'aria-label':NAME[k], 'data-t':k}, hits);
+    el('circle',{class:'ring', cx:HX, cy:Y[k], r:20}, g);
+  }
+
+  // done overlay
+  const stage = $('stage');
+  stage.querySelector('.done-card')?.remove();
+  if (st.i >= ACTIONS.length){
+    const secs = Math.round((st.tEnd - st.t0)/1000);
+    const rank = st.miss === 0 && st.hints === 0 ? '裝冊老手' : st.miss + st.hints <= 3 ? '認真學徒' : '再練一次就上手';
+    const c = document.createElement('div'); c.className = 'done-card';
+    c.innerHTML = `<svg width="64" height="64" viewBox="0 0 64 64"><path d="M12 34l14 14 26-30" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="title">裝訂完成</div><div class="rank">${rank}</div>
+      <p>失誤 ${st.miss} 次　提示 ${st.hints} 次　用時 ${fmt(secs)}</p>
+      <p>翻回正面看看：上、下兩處繞過書背，中間一條直線。</p>`;
+    const again = document.createElement('button'); again.className='btn'; again.textContent='再玩一次'; again.onclick = reset;
+    c.appendChild(again);
+    stage.appendChild(c);
+  }
+
+  // steps list
+  const cur = st.i < ACTIONS.length ? ACTIONS[st.i].step : 8;
+  const ol = $('steps'); ol.innerHTML = '';
+  STEPS.forEach((s, idx) => {
+    const li = document.createElement('li');
+    li.className = idx < cur ? 'done' : idx === cur || (cur === 8 && idx === 7) ? (cur === 8 ? 'done' : 'now') : '';
+    li.innerHTML = `<span class="n">${idx < cur || cur===8 ? '✓' : idx+1}</span><span></span>`;
+    li.lastChild.textContent = s;
+    ol.appendChild(li);
+  });
+
+  document.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === st.tool)));
+  updateStats();
+}
+
+function fmt(s){ return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function updateStats(){
+  $('sMiss').textContent = st.miss; $('sHint').textContent = st.hints;
+  const s = st.t0 === null ? 0 : Math.round(((st.tEnd ?? Date.now()) - st.t0)/1000);
+  $('sTime').textContent = fmt(s);
+}
+
+function hint(){
+  const a = ACTIONS[st.i]; if (!a) return;
+  st.hints++; updateStats();
+  let node;
+  if (a.target === 'flip' || st.view !== a.side) node = $('flipBtn');
+  else if (a.tool && st.tool !== a.tool) node = $('t-' + a.tool);
+  else node = document.querySelector(`#hits [data-t="${a.target}"] .ring`);
+  node.classList.remove('pulse'); void node.getBoundingClientRect(); node.classList.add('pulse');
+  say('提示：' + a.task);
+}
+
+function reset(){
+  st = fresh(); st.drawnUpTo = 0;
+  render();
+  say('準備好了：線尾留在背面，針在背面的中孔後面。');
+}
+
+$('hits').parentNode.addEventListener('click', e => {
+  const g = e.target.closest('.hit'); if (g) attempt(g.dataset.t);
+});
+$('book').addEventListener('keydown', e => {
+  const g = e.target.closest?.('.hit');
+  if (g && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); attempt(g.dataset.t); }
+});
+$('flipBtn').onclick = () => attempt('flip');
+$('hintBtn').onclick = hint;
+$('resetBtn').onclick = reset;
+document.querySelectorAll('.tool').forEach(b => b.onclick = () => { st.tool = b.dataset.tool; render(); });
+setInterval(() => { if (st.t0 !== null && st.tEnd === null) updateStats(); }, 1000);
+reset();
+})();
+</script>
+
+</body>
+</html>
