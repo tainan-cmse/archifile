@@ -112,7 +112,7 @@ ol.steps li.done .n{background:var(--ink);color:var(--paper-2)}
         <h1>三眼綴訂<br>穿線挑戰</h1>
         <span class="en">Three-Hole Stab Binding</span>
       </div>
-      <p>檔案修護完成後，要用三眼綴訂把卷宗重新裝訂起來。拿起針線，照著順序在上、中、下三個孔之間上下穿梭，翻面打結，最後把線結藏進孔裡。</p>
+      <p>檔案修護完成後，要用三眼綴訂把卷宗重新裝訂起來。拿起針線，照著順序在上、中、下三個孔之間穿梭，跨過長線打結，最後把線結藏進孔裡。</p>
       <div class="chips"><span>8 個步驟</span><span>3 種工具</span><span>手機也能玩</span></div>
       <div><button class="btn big" id="startBtn">開始穿線</button></div>
     </div>
@@ -195,25 +195,24 @@ const HX = 292, EDGE = 349, Y = {up:130, mid:240, down:350};
 const NAME = {up:'上孔', mid:'中孔', down:'下孔'};
 const TOOLNAME = {needle:'針線', scissors:'剪刀', awl:'錐子'};
 const STEPS = [
-  '針由「中孔」穿出，背面留線尾',
-  '往上穿入「上孔」',
-  '在背面往下，由「下孔」穿出',
-  '往上穿入「中孔」，回到背面',
-  '翻到背面，線頭與線尾打結',
+  '針由「中孔」往下穿，留一段線尾',
+  '在背面往上，由「上孔」穿出',
+  '拉長線到「下孔」，往下穿入',
+  '在背面往上，由「中孔」穿出',
+  '跨過長線，與線尾打結',
   '剪去多餘的線',
-  '用錐子把線結推入孔中',
-  '完成：線結藏入中孔'
+  '用錐子把線結推入中孔',
+  '完成：一條長線貫穿三孔'
 ];
 // Each action: what to click, on which side, with which tool, and which numbered step it belongs to.
 const ACTIONS = [
-  {step:0, target:'mid',   side:'front', tool:'needle', task:'把針從背面推出來，點正面的「中孔」。'},
-  {step:1, target:'up',    side:'front', tool:'needle', task:'把針穿入「上孔」。'},
-  {step:2, target:'down',  side:'front', tool:'needle', task:'線在背面沿著直線往下拉，從「下孔」穿出。'},
-  {step:3, target:'mid',   side:'front', tool:'needle', task:'線在正面往上回到中間，穿入「中孔」。'},
-  {step:4, target:'flip',  side:'front', tool:null,     task:'線頭到背面了，按「翻面」。'},
-  {step:4, target:'mid',   side:'back',  tool:'needle', task:'把線頭和線尾在「中孔」拉緊打結。'},
-  {step:5, target:'mid',   side:'back',  tool:'scissors', task:'換剪刀，剪掉中孔多餘的線。'},
-  {step:6, target:'mid',   side:'back',  tool:'awl',   task:'換錐子，把線結推進中孔藏起來。'}
+  {step:0, target:'mid',  side:'front', tool:'needle',   task:'把針從正面往下穿入「中孔」，留一段線尾。'},
+  {step:1, target:'up',   side:'front', tool:'needle',   task:'線在背面往上走，從「上孔」穿出。'},
+  {step:2, target:'down', side:'front', tool:'needle',   task:'在正面拉一條長線到「下孔」，往下穿入。'},
+  {step:3, target:'mid',  side:'front', tool:'needle',   task:'線在背面往上走，從「中孔」穿出。'},
+  {step:4, target:'mid',  side:'front', tool:'needle',   task:'跨過長線，在「中孔」和線尾打結。'},
+  {step:5, target:'mid',  side:'front', tool:'scissors', task:'換剪刀，剪掉中孔多餘的線。'},
+  {step:6, target:'mid',  side:'front', tool:'awl',      task:'換錐子，把線結推進中孔藏起來。'}
 ];
 const $ = id => document.getElementById(id);
 const NS = 'http://www.w3.org/2000/svg';
@@ -221,7 +220,7 @@ let st;
 
 function fresh(){
   return {i:0, view:'front', tool:'needle', miss:0, hints:0, t0:null, tEnd:null,
-          segs:[], mark:null, needle:{side:'back', at:'mid'}, knot:'none', last:-1};
+          segs:[], mark:null, needle:{side:'front', at:'mid'}, knot:'none', last:-1};
 }
 
 function el(tag, attrs, parent){
@@ -234,29 +233,23 @@ function el(tag, attrs, parent){
 function apply(a){
   const add = (side, d) => st.segs.push({side, d, n: st.segs.length});
   switch(st.i){
-    case 0: st.mark={at:'mid',type:'out',side:'front'}; st.needle={side:'front',at:'mid'}; break;
-    case 1: add('front',`M${HX} ${Y.mid}V${Y.up}`); st.mark={at:'up',type:'in',side:'front'}; st.needle={side:'back',at:'up'}; break;
-    case 2: add('back',`M${HX} ${Y.up}V${Y.down}`); st.mark={at:'down',type:'out',side:'front'}; st.needle={side:'front',at:'down'}; break;
-    case 3: add('front',`M${HX} ${Y.down}V${Y.mid}`); st.mark={at:'mid',type:'in',side:'front'}; st.needle={side:'back',at:'mid'}; break;
-    case 4: break;
-    case 5: st.knot='tied'; st.mark=null; break;
-    case 6: st.knot='cut'; break;
-    case 7: st.knot='hidden'; st.needle=null; break;
+    case 0: st.mark={at:'mid',type:'in',side:'front'}; st.needle={side:'back',at:'mid'}; break;
+    case 1: add('back',`M${HX} ${Y.mid}V${Y.up}`); st.mark={at:'up',type:'out',side:'front'}; st.needle={side:'front',at:'up'}; break;
+    case 2: add('front',`M${HX} ${Y.up}V${Y.down}`); st.mark={at:'down',type:'in',side:'front'}; st.needle={side:'back',at:'down'}; break;
+    case 3: add('back',`M${HX} ${Y.down}V${Y.mid}`); st.mark={at:'mid',type:'out',side:'front'}; st.needle={side:'front',at:'mid'}; break;
+    case 4: st.knot='tied'; st.mark=null; break;
+    case 5: st.knot='cut'; break;
+    case 6: st.knot='hidden'; st.needle=null; break;
   }
   st.last = st.segs.length;
   st.i++;
 }
 
 function attempt(target){
+  if (target === 'flip'){ doFlip(() => render(), true); return; }
   if (st.i >= ACTIONS.length) return;
   if (st.t0 === null) st.t0 = Date.now();
   const a = ACTIONS[st.i];
-  if (target === 'flip'){
-    if (a.target === 'flip'){ doFlip(() => { apply(a); say(`翻到背面了。線頭從中孔出來，正好和線尾在一起。`, 'good'); render(); }); }
-    else doFlip(() => render(), true);
-    return;
-  }
-  if (a.target === 'flip'){ miss(`線頭已經穿到背面了，先按「翻面」看看背面。`); return; }
   if (st.view !== a.side){ miss(a.side === 'front' ? '這一步要在正面操作，先翻回正面。' : '這一步要在背面操作，先翻到背面。'); return; }
   if (target !== a.target){
     const want = a.target === 'spine' ? '書背' : NAME[a.target];
@@ -335,38 +328,27 @@ function render(){
   });
   st.drawnUpTo = st.segs.length;
 
-  // back-side tails, knot
-  if (back){
+  // front tails and knot
+  const line = (d, color, w) => { el('path',{d, stroke:'#1b1714','stroke-width':w+3.5,'stroke-linecap':'round',fill:'none'}, th); el('path',{d, stroke:color,'stroke-width':w,'stroke-linecap':'round',fill:'none'}, th); };
+  if (!back){
     if (st.knot === 'none'){
-      el('path',{d:`M${HX} ${Y.mid} q-30 20 -70 34`, stroke:'#1b1714','stroke-width':8,'stroke-linecap':'round',fill:'none'}, th);
-      el('path',{d:`M${HX} ${Y.mid} q-30 20 -70 34`, stroke:'#fbf8f1','stroke-width':4.5,'stroke-linecap':'round',fill:'none'}, th);
-      if (st.i >= 4){
-        el('path',{d:`M${HX} ${Y.mid} q-30 -20 -70 -34`, stroke:'#1b1714','stroke-width':8,'stroke-linecap':'round',fill:'none'}, th);
-        el('path',{d:`M${HX} ${Y.mid} q-30 -20 -70 -34`, stroke:'var(--thread)','stroke-width':4.5,'stroke-linecap':'round',fill:'none'}, th);
-      }
+      if (st.i >= 1) line(`M${HX} ${Y.mid} q26 22 38 66`, '#fbf8f1', 4.5);
+      if (st.i >= 4) line(`M${HX} ${Y.mid} q30 -12 56 -46`, 'var(--thread)', 4.5);
     } else if (st.knot === 'tied' || st.knot === 'cut'){
       const len = st.knot === 'tied' ? 70 : 14;
-      for (const dir of [-1,1]){
-        const d = `M${HX-6} ${Y.mid} l${-len} ${dir*len*0.55}`;
-        el('path',{d, stroke:'#1b1714','stroke-width':7,'stroke-linecap':'round'}, th);
-        el('path',{d, stroke:'var(--thread)','stroke-width':4,'stroke-linecap':'round'}, th);
-      }
-      el('circle',{cx:HX-4, cy:Y.mid, r:10, fill:'none', stroke:'#1b1714','stroke-width':7}, th);
-      el('circle',{cx:HX-4, cy:Y.mid, r:10, fill:'none', stroke:'var(--thread)','stroke-width':4}, th);
-      if (st.knot === 'cut'){
-        el('path',{d:`M${HX-34} ${Y.mid-26}v52`, stroke:'var(--thread)','stroke-width':2.5,'stroke-dasharray':'5 4'}, th);
-      }
+      for (const dir of [-1,1]) line(`M${HX+6} ${Y.mid} l${len} ${dir*len*0.55}`, 'var(--thread)', 4);
+      el('circle',{cx:HX+2, cy:Y.mid, r:10, fill:'none', stroke:'#1b1714','stroke-width':7.5}, th);
+      el('circle',{cx:HX+2, cy:Y.mid, r:10, fill:'none', stroke:'var(--thread)','stroke-width':4}, th);
+      if (st.knot === 'cut') el('path',{d:`M${HX+34} ${Y.mid-26}v52`, stroke:'var(--thread)','stroke-width':2.5,'stroke-dasharray':'5 4'}, th);
     } else if (st.knot === 'hidden'){
       el('circle',{cx:HX, cy:Y.mid, r:7, fill:'#fbf8f1', stroke:'#1b1714','stroke-width':2}, th);
     }
-  } else if (st.needle && st.needle.side === 'back' && st.i === 0) {
-    // nothing on front yet
   }
 
   // needle
   const away = $('needleAway');
   away.hidden = true;
-  if (st.needle && st.i < 5){
+  if (st.needle && st.i < 4){
     if (st.needle.side === me){
       const y = Y[st.needle.at];
       el('path',{d:`M${HX+4} ${y-3} L${HX+62} ${y-44}`, stroke:'#1b1714','stroke-width':3,'stroke-linecap':'round'}, th);
@@ -396,16 +378,17 @@ function render(){
   // done overlay
   const stage = $('stage');
   stage.querySelector('.done-card')?.remove();
-  if (st.i >= ACTIONS.length){
+  if (st.i >= ACTIONS.length && !st.hideCard){
     const secs = Math.round((st.tEnd - st.t0)/1000);
     const rank = st.miss === 0 && st.hints === 0 ? '裝冊老手' : st.miss + st.hints <= 3 ? '認真學徒' : '再練一次就上手';
     const c = document.createElement('div'); c.className = 'done-card';
     c.innerHTML = `<svg width="64" height="64" viewBox="0 0 64 64"><path d="M12 34l14 14 26-30" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div class="title"><span>裝訂完成</span></div><div class="rank">${rank}</div>
       <p>失誤 ${st.miss} 次　提示 ${st.hints} 次　用時 ${fmt(secs)}</p>
-      <p>翻回正面看看：線沿著上、中、下三孔連成一條直線。</p>`;
+      <p>正面是一條長線貫穿三孔，翻到背面看看：上–中、中–下兩段短線。</p>`;
     const again = document.createElement('button'); again.className='btn'; again.textContent='再玩一次'; again.onclick = reset;
-    c.appendChild(again);
+    const peek = document.createElement('button'); peek.className='btn flip'; peek.textContent='翻面看成品'; peek.onclick = () => { st.hideCard = true; attempt('flip'); };
+    const r = document.createElement('div'); r.className='row'; r.style.justifyContent='center'; r.append(peek, again); c.appendChild(r);
     stage.appendChild(c);
   }
 
@@ -435,7 +418,7 @@ function hint(){
   const a = ACTIONS[st.i]; if (!a) return;
   st.hints++; updateStats();
   let node;
-  if (a.target === 'flip' || st.view !== a.side) node = $('flipBtn');
+  if (st.view !== a.side) node = $('flipBtn');
   else if (a.tool && st.tool !== a.tool) node = $('t-' + a.tool);
   else node = document.querySelector(`#hits [data-t="${a.target}"] .ring`);
   node.classList.remove('pulse'); void node.getBoundingClientRect(); node.classList.add('pulse');
@@ -445,7 +428,7 @@ function hint(){
 function reset(){
   st = fresh(); st.drawnUpTo = 0;
   render();
-  say('準備好了：線尾留在背面，針在背面的中孔後面。');
+  say('準備好了：針線在正面，對準中孔。');
 }
 
 $('hits').parentNode.addEventListener('click', e => {
