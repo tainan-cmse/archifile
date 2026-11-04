@@ -313,7 +313,9 @@ function render(){
   const back = st.view === 'back';
   $('mirror').setAttribute('transform', back ? 'translate(376 0) scale(-1 1)' : '');
   $('cover').setAttribute('fill', back ? '#ece8df' : '#f5f3ee');
-  $('coverPhoto').setAttribute('display', back ? 'none' : 'inline');
+  // The titled cover belongs on 正面 (the flipped view); un-mirror it there and keep it clear of the hole labels.
+  $('coverPhoto').setAttribute('display', back ? 'inline' : 'none');
+  $('coverPhoto').setAttribute('transform', back ? 'translate(376 0) scale(-1 1) translate(156 0) scale(.84 1) translate(-44 0)' : '');
   const tag = $('sideTag'); tag.textContent = back ? '正面' : '背面'; tag.className = 'side-tag' + (back ? ' back' : '');
 
   // holes and labels
