@@ -170,7 +170,7 @@ ol.steps li.done .n{background:var(--ink);color:var(--paper-2)}
           </g>
           <g id="labels" font-family="Noto Sans TC, sans-serif" font-size="18" font-weight="900" fill="#1b1714"></g>
         </svg>
-        <span class="side-tag" id="sideTag">正面</span>
+        <span class="side-tag" id="sideTag">背面</span>
         <span class="needle-away" id="needleAway" hidden></span>
       </div>
 
@@ -206,10 +206,10 @@ const HX = 292, EDGE = 349, Y = {up:130, mid:240, down:350};
 const NAME = {up:'上孔', mid:'中孔', down:'下孔'};
 const TOOLNAME = {needle:'針線', scissors:'剪刀', awl:'錐子'};
 const STEPS = [
-  '針由「中孔」往下穿，留一段線尾',
-  '在背面往上，由「上孔」穿出',
-  '拉長線到「下孔」，往下穿入',
-  '在背面往上，由「中孔」穿出',
+  '針由背面從「中孔」往上穿，留一段線尾',
+  '針線往上走，從「上孔」往下穿',
+  '拉長線到「下孔」，往上穿出',
+  '在正面往上，由「中孔」往下穿入',
   '跨過長線，與線尾打結',
   '剪去多餘的線',
   '用錐子把線結推入中孔',
@@ -217,10 +217,10 @@ const STEPS = [
 ];
 // Each action: what to click, on which side, with which tool, and which numbered step it belongs to.
 const ACTIONS = [
-  {step:0, target:'mid',  side:'front', tool:'needle',   task:'把針從正面往下穿入「中孔」，留一段線尾。'},
-  {step:1, target:'up',   side:'front', tool:'needle',   task:'線在背面往上走，從「上孔」穿出。'},
-  {step:2, target:'down', side:'front', tool:'needle',   task:'在正面拉一條長線到「下孔」，往下穿入。'},
-  {step:3, target:'mid',  side:'front', tool:'needle',   task:'線在背面往上走，從「中孔」穿出。'},
+  {step:0, target:'mid',  side:'front', tool:'needle',   task:'針由背面從「中孔」往上穿，留一段線尾。'},
+  {step:1, target:'up',   side:'front', tool:'needle',   task:'針線在正面往上走，從「上孔」往下穿回背面。'},
+  {step:2, target:'down', side:'front', tool:'needle',   task:'在背面拉長線到「下孔」，往上穿出到正面。'},
+  {step:3, target:'mid',  side:'front', tool:'needle',   task:'在正面往上，由「中孔」往下穿入，回到背面。'},
   {step:4, target:'mid',  side:'front', tool:'needle',   task:'跨過長線，在「中孔」和線尾打結。'},
   {step:5, target:'mid',  side:'front', tool:'scissors', task:'換剪刀，剪掉中孔多餘的線。'},
   {step:6, target:'mid',  side:'front', tool:'awl',      task:'換錐子，把線結推進中孔藏起來。'}
@@ -261,7 +261,7 @@ function attempt(target){
   if (st.i >= ACTIONS.length) return;
   if (st.t0 === null) st.t0 = Date.now();
   const a = ACTIONS[st.i];
-  if (st.view !== a.side){ miss(a.side === 'front' ? '這一步要在正面操作，先翻回正面。' : '這一步要在背面操作，先翻到背面。'); return; }
+  if (st.view !== a.side){ miss(a.side === 'front' ? '這一步要在背面操作，先翻回背面。' : '這一步要在正面操作，先翻到正面。'); return; }
   if (target !== a.target){
     const want = a.target === 'spine' ? '書背' : NAME[a.target];
     const got = target === 'spine' ? '書背' : NAME[target];
@@ -304,7 +304,7 @@ function doFlip(after, plain){
   setTimeout(() => {
     st.view = st.view === 'front' ? 'back' : 'front';
     after();
-    if (plain) say(`現在看的是${st.view === 'front' ? '正面' : '背面'}。`);
+    if (plain) say(`現在看的是${st.view === 'front' ? '背面' : '正面'}。`);
     b.classList.remove('flipping');
   }, 280);
 }
@@ -314,7 +314,7 @@ function render(){
   $('mirror').setAttribute('transform', back ? 'translate(376 0) scale(-1 1)' : '');
   $('cover').setAttribute('fill', back ? '#ece8df' : '#f5f3ee');
   $('coverPhoto').setAttribute('display', back ? 'none' : 'inline');
-  const tag = $('sideTag'); tag.textContent = back ? '背面' : '正面'; tag.className = 'side-tag' + (back ? ' back' : '');
+  const tag = $('sideTag'); tag.textContent = back ? '正面' : '背面'; tag.className = 'side-tag' + (back ? ' back' : '');
 
   // holes and labels
   const holes = $('holes'); holes.innerHTML = '';
@@ -369,7 +369,7 @@ function render(){
       el('ellipse',{cx:HX+64, cy:y-46, rx:2.4, ry:5, transform:`rotate(54 ${HX+64} ${y-46})`, fill:'none', stroke:'#1b1714','stroke-width':2}, th);
     } else {
       away.hidden = false;
-      away.textContent = `針目前在${st.needle.side === 'back' ? '背面' : '正面'}的${NAME[st.needle.at]}`;
+      away.textContent = `針目前在${st.needle.side === 'back' ? '正面' : '背面'}的${NAME[st.needle.at]}`;
     }
   }
 
@@ -399,7 +399,7 @@ function render(){
     c.innerHTML = `<svg width="64" height="64" viewBox="0 0 64 64"><path d="M12 34l14 14 26-30" fill="none" stroke="var(--ok)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div class="title"><span>裝訂完成</span></div><div class="rank">${rank}</div>
       <p>失誤 ${st.miss} 次　提示 ${st.hints} 次　用時 ${fmt(secs)}</p>
-      <p>正面是一條長線貫穿三孔，翻到背面看看：上–中、中–下兩段短線。</p>`;
+      <p>背面是一條長線貫穿三孔，翻到正面看看：上–中、中–下兩段短線。</p>`;
     const again = document.createElement('button'); again.className='btn'; again.textContent='再玩一次'; again.onclick = reset;
     const peek = document.createElement('button'); peek.className='btn flip'; peek.textContent='翻面看成品'; peek.onclick = () => { st.hideCard = true; attempt('flip'); };
     const r = document.createElement('div'); r.className='row'; r.style.justifyContent='center'; r.append(peek, again); c.appendChild(r);
@@ -442,7 +442,7 @@ function hint(){
 function reset(){
   st = fresh(); st.drawnUpTo = 0;
   render();
-  say('準備好了：針線在正面，對準中孔。');
+  say('準備好了：現在看的是卷宗背面，針線對準中孔。');
 }
 
 $('hits').parentNode.addEventListener('click', e => {
