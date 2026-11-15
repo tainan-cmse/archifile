@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>檔案國家隊選拔賽｜箱一 徵集</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Sans:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Sans:wght@600;700&display=swap">
 <style>
 :root{--paper:#efe9d8;--paper-2:#f7f3e8;--ink:#1b1714;--muted:#5e5549;--red:#c8322a;--dred:#6c291f;--yellow:#f3e03b;--grey:#bcb39c;--blue:#3a8fd6;
 --f:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;--en:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;color-scheme:light}
@@ -103,6 +103,9 @@ textarea{width:100%;min-height:90px;font:inherit;border:2.5px solid var(--ink);p
 footer{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;border-top:2px solid var(--ink);padding-top:8px}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
 
+:root{--round:"Huninn","jf-openhuninn","Noto Sans TC",sans-serif}
+h1,h2,h3,.stamp,.titleblock h1{font-family:var(--round);font-weight:400!important;letter-spacing:.06em}
+.panel h2 small{font-family:var(--f);font-weight:700}
 .tour{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700;font-size:14px}
 .tour b{font-weight:900;margin-right:2px}
 .tour a{color:var(--ink);text-decoration:none;border:2px solid var(--ink);background:var(--paper-2);padding:1px 10px;display:inline-flex;gap:4px;align-items:center}
@@ -189,16 +192,16 @@ if(left===0){$('#certHint').hidden=true;$('#certForm').hidden=false;coach('done'
 else if(done.length){coach('good',`你已經通過 ${done.length} 關，再加油！`,'good');}
 else coach('idle','歡迎來到選拔賽！從第 1 關開始吧。');
 function wrapT(c,t,x,y){c.fillText(t,x,y);}
-$('#mk').onclick=async()=>{const name=($('#nm').value.trim()||'檔案小隊員');try{await document.fonts.load('900 60px "Noto Sans TC"');}catch(e){}
+$('#mk').onclick=async()=>{const name=($('#nm').value.trim()||'檔案小隊員');try{await document.fonts.load('400 60px "Huninn"');await document.fonts.load('500 40px "Noto Sans TC"');}catch(e){}
  const cv=$('#cv'),c=cv.getContext('2d'),W=1600,H=1100;
  c.fillStyle='#efe9d8';c.fillRect(0,0,W,H);
  c.fillStyle='rgba(27,23,20,.10)';for(let y=6;y<H;y+=14)for(let x=6;x<W;x+=14){c.beginPath();c.arc(x,y,2,0,7);c.fill();}
  c.lineWidth=10;c.strokeStyle='#231815';c.strokeRect(40,40,W-80,H-80);c.lineWidth=3;c.strokeRect(62,62,W-124,H-124);
  c.fillStyle='#231815';c.fillRect(62,62,W-124,70);c.fillStyle='#F3E03B';c.font='700 30px "IBM Plex Sans",sans-serif';c.textAlign='left';c.fillText('BOX 1 · TRYOUTS FOR THE NATIONAL ARCHIVES TEAM',96,108);
  c.textAlign='center';
- c.fillStyle='#F3E03B';c.fillRect(W/2-330,190,660,110);c.fillStyle='#231815';c.font='900 96px "Noto Sans TC",sans-serif';c.fillText('國家隊證書',W/2,282);
+ c.fillStyle='#F3E03B';c.fillRect(W/2-330,190,660,110);c.fillStyle='#231815';c.font='400 96px "Huninn",sans-serif';c.fillText('國家隊證書',W/2,282);
  c.font='500 40px "Noto Sans TC",sans-serif';c.fillText('茲證明',W/2,400);
- c.font='900 104px "Noto Sans TC",sans-serif';c.fillStyle='#C8322A';c.fillText(name,W/2,530);
+ c.font='400 104px "Huninn",sans-serif';c.fillStyle='#C8322A';c.fillText(name,W/2,530);
  c.fillStyle='#231815';c.fillRect(W/2-360,560,720,5);
  c.font='500 40px "Noto Sans TC",sans-serif';c.fillText('通過「檔案國家隊選拔賽」三關考驗',W/2,650);
  c.fillText('正式成為見證歷史的國家級選手！',W/2,710);
@@ -206,7 +209,7 @@ $('#mk').onclick=async()=>{const name=($('#nm').value.trim()||'檔案小隊員')
  const d=new Date();c.font='500 30px "Noto Sans TC",sans-serif';c.fillText(`${d.getFullYear()} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日`,W/2,960);
  // 印章
  c.save();c.translate(W-330,880);c.rotate(-.12);c.fillStyle='#C8322A';c.fillRect(-150,-80,300,160);c.strokeStyle='#231815';c.lineWidth=5;c.strokeRect(-150,-80,300,160);
- c.fillStyle='#F7F3E8';c.font='900 52px "Noto Sans TC",sans-serif';c.fillText('國家級',0,-10);c.fillText('MAX!',0,55);c.restore();
+ c.fillStyle='#F7F3E8';c.font='400 52px "Huninn",sans-serif';c.fillText('國家級',0,-10);c.fillText('MAX!',0,55);c.restore();
  const im=new Image();im.onload=()=>{c.drawImage(im,150,760,220,250);fin();};im.onerror=fin;im.src=D.ch.done;
  function fin(){cv.hidden=false;const u=cv.toDataURL('image/png');$('#dl').href=u;$('#dl').hidden=false;coach('done',`恭喜 <b>${name.replace(/[<>&]/g,'')}</b> 正式入隊！`,'good');}};
 
