@@ -12,7 +12,7 @@
 body{margin:0;background-color:var(--paper);background-image:radial-gradient(rgba(27,23,20,.10) 1.1px,transparent 1.5px);background-size:7px 7px;color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.65;
 padding:max(14px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
 .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-.tohome{align-self:flex-start;display:inline-flex;font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border:2.5px solid var(--ink);background:var(--paper-2);padding:4px 12px;box-shadow:3px 3px 0 var(--ink)}
+.tohome{display:inline-flex;font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border:2.5px solid var(--ink);background:var(--paper-2);padding:4px 12px;box-shadow:3px 3px 0 var(--ink)}
 .titleblock{display:inline-flex;flex-direction:column;align-self:flex-start;gap:2px}
 .titleblock h1{margin:0;font-weight:900;font-size:clamp(30px,7vw,56px);line-height:1.1;letter-spacing:.05em;background:linear-gradient(var(--yellow),var(--yellow)) no-repeat .3em .25em/calc(100% - .2em) calc(100% - .1em);padding-right:.2em}
 .en{font-family:var(--en);font-weight:700;font-size:14px;letter-spacing:.04em}
@@ -93,20 +93,28 @@ header.bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 18px;border
 .piece.used{display:none}
 .hint{font-size:14px;color:var(--muted);text-align:center;margin:0}
 /* L5 */
-.band{display:flex;align-items:center;justify-content:space-between;gap:8px;border:3px solid var(--ink);background:#fff;padding:10px 14px;font-weight:900;font-size:clamp(16px,3.8vw,22px);flex-wrap:wrap}
+.band{display:flex;align-items:center;justify-content:space-between;gap:8px;border:3px solid var(--ink);background:#fff;padding:10px clamp(6px,2vw,14px);font-weight:900;font-size:clamp(13px,3.5vw,22px);flex-wrap:nowrap;white-space:nowrap}
 .band .r{color:var(--red)} .band .mid{background:var(--yellow);border:2.5px solid var(--ink);padding:2px 12px;display:inline-flex;gap:6px;align-items:center}
 .band .mid .ic{width:24px;display:inline-block}
 .stamp{align-self:center;background:var(--red);color:var(--paper-2);border:3px solid var(--ink);font-weight:900;font-size:clamp(22px,5vw,32px);padding:10px 24px;transform:rotate(-3deg);text-align:center;line-height:1.3;box-shadow:6px 6px 0 var(--ink)}
 textarea{width:100%;min-height:90px;font:inherit;border:2.5px solid var(--ink);padding:10px;background:#fff;resize:vertical}
 .cert{border:3px double var(--ink);background:#fff;padding:14px;text-align:center}
 .cert b{font-size:20px} .cert p{margin:6px 0 0;white-space:pre-wrap}
+.tour{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:700;font-size:14px}
+.tour b{font-weight:900;margin-right:2px}
+.tour a{color:var(--ink);text-decoration:none;border:2px solid var(--ink);background:var(--paper-2);padding:1px 10px;display:inline-flex;gap:4px;align-items:center}
+.tour a.cur{background:var(--ink);color:var(--yellow)}
+.tour a.ok::after{content:"✓";color:var(--red);font-weight:900}
+.tour a.cur.ok::after{color:var(--yellow)}
+.topnav{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between}
+a.btn{text-decoration:none;display:inline-block}
 footer{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;border-top:2px solid var(--ink);padding-top:8px}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<a class="tohome" href="https://tainan-cmse.github.io/archifile/#box1">← 回到線上任務首頁</a>
+<div class="topnav"><a class="tohome" href="https://tainan-cmse.github.io/archifile/#box1">← 回到線上任務首頁</a><nav class="tour" aria-label="檔案國家隊選拔賽關卡"><b>選拔賽</b><a href="https://tainan-cmse.github.io/archifile/box1-1-1/" data-lv="1">第 1 關</a><a href="https://tainan-cmse.github.io/archifile/box1-1-2/" data-lv="2">第 2 關</a><a href="https://tainan-cmse.github.io/archifile/box1-1-3/" data-lv="3" class="cur">第 3 關</a><a href="https://tainan-cmse.github.io/archifile/box1/">總表・證書</a></nav></div>
 
 <section class="intro" id="intro">
   <div class="cube"><svg viewBox="0 0 230 190" width="100%"><defs><pattern id="ht" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.1" fill="#231815"/></pattern><pattern id="htc" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.1" fill="#f0ebde"/></pattern></defs>
@@ -193,13 +201,13 @@ footer{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;justify-c
     <div class="stamp">國家檔案<br>值得被認識！</div>
     <label for="story" style="font-weight:900">如果你的故事被收進國家檔案，你希望是哪一段？</label>
     <textarea id="story" placeholder="例如：我第一次參加比賽、我們家搬到新城市的那一天……（只會顯示在你的畫面上，不會上傳）"></textarea>
-    <div class="row"><button class="btn y" id="certBtn">做成我的檔案卡</button><button class="btn" id="again">再玩一次</button></div>
+    <div class="row"><button class="btn y" id="certBtn">做成我的檔案卡</button><a class="btn big" href="https://tainan-cmse.github.io/archifile/box1/">領取國家隊證書</a><button class="btn" id="again">再玩一次</button></div>
     <div class="cert" id="cert" hidden><b>我的國家檔案（預定）</b><p id="certTxt"></p></div>
   </section>
  </div>
 </div>
 
-<footer><span>國家發展委員會檔案管理局 · 國家檔案館</span><span>檔案體驗箱暨主題行動展示設計製作案 · 箱一 1-3</span></footer>
+<footer><span>國家發展委員會檔案管理局 · 國家檔案館</span><span>檔案體驗箱暨主題行動展示設計製作案 · 箱一 徵集 · 檔案國家隊選拔賽</span></footer>
 </div>
 
 <script>
@@ -213,7 +221,10 @@ function go(n){level=n;$$('.panel').forEach(p=>p.hidden=p.id!=='L'+n);
  $$('#prog i').forEach((e,i)=>e.className=i+1<n?'done':(i+1===n?'on':''));
  const tips={1:'先猜猜看！國家檔案和你家有關係嗎？',2:'點一下卡片翻開。每個問題，都有一種檔案能找到答案！',3:'看看這張檔案卡，把它放進「常民的」或「國家的」口袋。',4:'國家檔案像一座殿堂，靠四個重要的支撐撐起來。',5:'你完成了！最後，想想你自己的故事。'};
  coach(n===5?'done':'idle',tips[n]);window.scrollTo({top:0,behavior:'smooth'});
- if(n===3)startDeck(); }
+ if(n===3)startDeck();
+ if(n===5){try{localStorage.setItem('box1_lv3','1')}catch(e){} tour();} }
+function tour(){document.querySelectorAll('.tour a').forEach(a=>{let v=null;try{v=localStorage.getItem('box1_lv'+a.dataset.lv)}catch(e){} if(v==='1')a.classList.add('ok');});}
+tour();
 $('#startBtn').onclick=()=>{$('#intro').hidden=true;$('#game').hidden=false;go(1);};
 $$('[data-next]').forEach(b=>b.onclick=()=>go(+b.dataset.next));
 // L1
