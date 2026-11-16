@@ -3,18 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}
+/* 全站字體統一：標題粉圓體、內文思源黑體 */
+h1,h2,h3,.card h2,.titleblock h1,.done-card .title,.finish .title{font-family:var(--f-display);font-weight:400!important;letter-spacing:.06em}
+</style>
 </head>
 <body>
 <title>紙張修護師挑戰</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Sans:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Sans:wght@600;700&display=swap">
 <style>
 /* Layout: 「檔案國家隊」poster world shared with the 三眼綴訂 game — halftone paper, yellow title block, black ink, red accents; intro, then restoration bench (document on a cutting mat + toolbox) beside the 13-step card */
 :root{
   --paper:#efe9d8; --paper-2:#f7f3e8; --ink:#1b1714; --muted:#5e5549; --red:#d2392b; --yellow:#f4e64b; --blue:#3a8fd6; --green:#2f8f4e;
   --mat:#2f4a44;
-  --f-display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-display:"Huninn","jf-openhuninn","Noto Sans TC",sans-serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
   --f-en:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   color-scheme:light;
@@ -51,7 +54,7 @@ header.bar .stats span{background:var(--paper-2);border:2px solid var(--ink);pad
 .mode-note{font-size:13.5px;color:var(--muted);margin:0}
 
 /* game */
-.rec{background:#fff;border:2.5px solid var(--ink);padding:10px 12px 12px;font-size:13.5px;line-height:1.45;font-family:"Noto Serif TC","Noto Sans TC",serif;box-shadow:4px 4px 0 var(--ink)}
+.rec{background:#fff;border:2.5px solid var(--ink);padding:10px 12px 12px;font-size:13.5px;line-height:1.45;font-family:var(--f-body);box-shadow:4px 4px 0 var(--ink)}
 .rec-h{font-weight:900;font-size:17px;text-align:center;letter-spacing:.06em;margin-bottom:4px}
 .rec-h small{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0}
 .rec-s{font-weight:900;margin-top:6px;display:flex;justify-content:space-between;gap:8px}
