@@ -13,7 +13,7 @@
 /* Layout: 「檔案國家隊」poster world — halftone paper, yellow title block, black ink frames; hero with the four team members, box filter bar, then one numbered band per archive box holding its game cards */
 :root{
   --paper:#efe9d8; --paper-2:#f7f3e8; --ink:#1b1714; --muted:#5e5549; --red:#d2392b; --yellow:#f4e64b; --blue:#3a8fd6;
-  --f-display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-display:"Huninn","jf-openhuninn","Noto Sans TC",sans-serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
   --f-en:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   color-scheme:light;
@@ -65,7 +65,7 @@ section.box{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;bord
 .card.soon span{font-size:13px;color:var(--muted)}
 footer{font-size:13px;color:var(--muted);border-top:3px solid var(--ink);padding-top:12px;display:flex;flex-wrap:wrap;gap:6px 18px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
-h1,.boxhead h2,.card h3{font-family:"Huninn","Noto Sans TC",sans-serif;font-weight:400!important}
+h1,.boxhead h2,.card h3{font-family:var(--f-display);font-weight:400!important}
 </style>
 
 <div class="wrap">
