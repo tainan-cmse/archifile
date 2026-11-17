@@ -5,7 +5,7 @@
  *  - 故事、證書暱稱這類文字，只有體驗者自己勾選同意才會送出
  */
 (function () {
-  var ENDPOINT = '';
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbz9RcCX4q4CdASSKD--l73P8qgXMw-irnM-TiamQ1im8ZmYh0sQgmaRpTTN3aWQi4QEGA/exec';
 
   var on = /^https:\/\/script\.google\.com\//.test(ENDPOINT);
   var page = (location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '').split('/').pop()) || 'home';
