@@ -345,6 +345,7 @@ a{color:var(--ink)}
   </div>
 </div>
 
+<script src="../collect.js"></script>
 <script>
 (() => {
 // ---------- Game data (one box = one config; other boxes can reuse the engine) ----------
@@ -623,6 +624,7 @@ function finish(){
     $('otherBtn').onclick=()=>start(st.mode==='learn'?'challenge':'learn');
   }, 1300);
   say('13 道工序全部完成！','good'); coach('done');
+  window.ARCHI && ARCHI.log('finish', {mode: st.mode==='learn'?'學習':'挑戰', secs: Math.round(ms/1000), miss: st.miss, hints: st.hints, rank});
 }
 
 function start(mode){
