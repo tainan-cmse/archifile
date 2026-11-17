@@ -140,7 +140,7 @@ h1,h2,h3,.stamp,.titleblock h1{font-family:var(--round);font-weight:400!importan
 .lv .ok{position:absolute;right:10px;top:10px;background:var(--red);color:#fff;border:2.5px solid var(--ink);font-weight:900;padding:2px 10px;transform:rotate(6deg)}
 .certbox{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
 .certbox input{font:inherit;font-size:18px;border:2.5px solid var(--ink);padding:8px 12px;background:#fff;width:min(100%,320px);text-align:center}
-canvas{width:min(100%,720px);height:auto;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:#fff}
+.certimg{width:min(100%,760px);height:auto;display:block;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:#fff;-webkit-touch-callout:default}
 
 </style>
 </head>
@@ -165,7 +165,7 @@ canvas{width:min(100%,720px);height:auto;border:3px solid var(--ink);box-shadow:
       <label for="nm" style="font-weight:900">寫上你的名字或暱稱</label>
       <input id="nm" maxlength="12" placeholder="例如：小檔案">
       <button class="btn big" id="mk">製作證書</button>
-      <canvas id="cv" width="1600" height="1100" hidden></canvas>
+      <canvas id="cv" width="2400" height="1650" hidden></canvas><img id="cvImg" class="certimg" alt="你的檔案國家隊證書" hidden>
       <a class="btn y" id="dl" download="檔案國家隊證書.png" hidden style="text-decoration:none">下載證書圖片</a>
       <p class="hint">手機也可以長按圖片儲存。名字只會留在你的手機上，不會上傳。</p>
     </div>
@@ -192,26 +192,89 @@ if(left===0){$('#certHint').hidden=true;$('#certForm').hidden=false;coach('done'
 else if(done.length){coach('good',`你已經通過 ${done.length} 關，再加油！`,'good');}
 else coach('idle','歡迎來到選拔賽！從第 1 關開始吧。');
 function wrapT(c,t,x,y){c.fillText(t,x,y);}
-$('#mk').onclick=async()=>{const name=($('#nm').value.trim()||'檔案小隊員');try{await document.fonts.load('400 60px "Huninn"');await document.fonts.load('500 40px "Noto Sans TC"');}catch(e){}
- const cv=$('#cv'),c=cv.getContext('2d'),W=1600,H=1100;
- c.fillStyle='#efe9d8';c.fillRect(0,0,W,H);
- c.fillStyle='rgba(27,23,20,.10)';for(let y=6;y<H;y+=14)for(let x=6;x<W;x+=14){c.beginPath();c.arc(x,y,2,0,7);c.fill();}
- c.lineWidth=10;c.strokeStyle='#231815';c.strokeRect(40,40,W-80,H-80);c.lineWidth=3;c.strokeRect(62,62,W-124,H-124);
- c.fillStyle='#231815';c.fillRect(62,62,W-124,70);c.fillStyle='#F3E03B';c.font='700 30px "IBM Plex Sans",sans-serif';c.textAlign='left';c.fillText('BOX 1 · TRYOUTS FOR THE NATIONAL ARCHIVES TEAM',96,108);
- c.textAlign='center';
- c.fillStyle='#F3E03B';c.fillRect(W/2-330,190,660,110);c.fillStyle='#231815';c.font='400 96px "Huninn",sans-serif';c.fillText('國家隊證書',W/2,282);
- c.font='500 40px "Noto Sans TC",sans-serif';c.fillText('茲證明',W/2,400);
- c.font='400 104px "Huninn",sans-serif';c.fillStyle='#C8322A';c.fillText(name,W/2,530);
- c.fillStyle='#231815';c.fillRect(W/2-360,560,720,5);
- c.font='500 40px "Noto Sans TC",sans-serif';c.fillText('通過「檔案國家隊選拔賽」三關考驗',W/2,650);
- c.fillText('正式成為見證歷史的國家級選手！',W/2,710);
- c.font='700 30px "Noto Sans TC",sans-serif';c.fillStyle='#5e5549';c.fillText('入隊選拔　・　國手與路人　・　小人物大時代',W/2,790);
- const d=new Date();c.font='500 30px "Noto Sans TC",sans-serif';c.fillText(`${d.getFullYear()} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日`,W/2,960);
- // 印章
- c.save();c.translate(W-330,880);c.rotate(-.12);c.fillStyle='#C8322A';c.fillRect(-150,-80,300,160);c.strokeStyle='#231815';c.lineWidth=5;c.strokeRect(-150,-80,300,160);
- c.fillStyle='#F7F3E8';c.font='400 52px "Huninn",sans-serif';c.fillText('國家級',0,-10);c.fillText('MAX!',0,55);c.restore();
- const im=new Image();im.onload=()=>{c.drawImage(im,150,760,220,250);fin();};im.onerror=fin;im.src=D.ch.done;
- function fin(){cv.hidden=false;const u=cv.toDataURL('image/png');$('#dl').href=u;$('#dl').hidden=false;coach('done',`恭喜 <b>${name.replace(/[<>&]/g,'')}</b> 正式入隊！`,'good');}};
+$('#mk').onclick=async()=>{const name=($('#nm').value.trim()||'檔案小隊員');
+ try{await Promise.all([document.fonts.load('400 60px "Huninn"','國家隊證書'+name),document.fonts.load('500 40px "Noto Sans TC"','茲證明'),document.fonts.load('700 40px "Noto Sans TC"','國家'),document.fonts.load('700 30px "IBM Plex Sans"','NO.')]);}catch(e){}
+ const S=1.5,W=1600,H=1100,cv=$('#cv');cv.width=W*S;cv.height=H*S;const c=cv.getContext('2d');c.setTransform(S,0,0,S,0,0);
+ const INK='#231815',RED='#C8322A',CREAM='#F7F3E8',HU='"Huninn",sans-serif',NS='"Noto Sans TC",sans-serif',EN='"IBM Plex Sans",sans-serif';
+ const gold=(x0,y0,x1,y1)=>{const g=c.createLinearGradient(x0,y0,x1,y1);[[0,'#7a5713'],[.22,'#c9982e'],[.42,'#f8e7a4'],[.55,'#d9ae45'],[.78,'#9c7420'],[1,'#e8c96a']].forEach(s=>g.addColorStop(s[0],s[1]));return g;};
+ const sp=(t,x,y,ls,al)=>{const ws=[...t].map(ch=>c.measureText(ch).width),tw=ws.reduce((a,b)=>a+b,0)+ls*(ws.length-1);let cx=al==='left'?x:al==='right'?x-tw:x-tw/2;const a0=c.textAlign;c.textAlign='left';[...t].forEach((ch,i)=>{c.fillText(ch,cx,y);cx+=ws[i]+ls;});c.textAlign=a0;return tw;};
+ const dia=(x,y,r,f)=>{c.beginPath();c.moveTo(x,y-r);c.lineTo(x+r,y);c.lineTo(x,y+r);c.lineTo(x-r,y);c.closePath();c.fillStyle=f;c.fill();};
+ // 編號：由日期與名字算出，只在本機
+ const d=new Date(),ymd=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+ let h=2166136261;for(const ch of name+ymd+d.getHours()+d.getMinutes()){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0;}
+ const serial=`NAT-${ymd}-${(h%100000).toString().padStart(5,'0')}`;
+ // 紙底
+ let g=c.createRadialGradient(W/2,H/2,120,W/2,H/2,980);g.addColorStop(0,'#fbf7ec');g.addColorStop(.65,'#f3ecd8');g.addColorStop(1,'#e4d8b8');c.fillStyle=g;c.fillRect(0,0,W,H);
+ c.fillStyle='rgba(35,24,21,.045)';for(let y=7;y<H;y+=14)for(let x=7;x<W;x+=14){c.beginPath();c.arc(x,y,1.6,0,7);c.fill();}
+ // 浮水印：中央玫瑰紋
+ c.save();c.translate(W/2,H/2+20);c.strokeStyle='rgba(176,132,40,.16)';c.lineWidth=1.1;
+ for(let k=0;k<36;k++){c.beginPath();for(let t=0;t<=Math.PI*2+.01;t+=.01){const r=250+38*Math.sin(9*t+k*Math.PI/18)+16*Math.cos(17*t);const x=r*Math.cos(t),y=r*Math.sin(t)*.82;t?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}
+ for(let k=0;k<24;k++){c.beginPath();for(let t=0;t<=Math.PI*2+.01;t+=.01){const r=120+22*Math.sin(12*t+k*Math.PI/12);const x=r*Math.cos(t),y=r*Math.sin(t)*.82;t?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}
+ c.restore();
+ // 外框：主視覺粗黑框
+ c.lineWidth=14;c.strokeStyle=INK;c.strokeRect(30,30,W-60,H-60);
+ // 紋帶：金色波紋（防偽紋）
+ c.save();c.beginPath();c.rect(48,48,W-96,H-96);c.rect(96,96,W-192,H-192);c.clip('evenodd');
+ c.lineWidth=.9;for(let k=0;k<6;k++){c.strokeStyle=k%2?'rgba(156,116,32,.55)':'rgba(200,50,42,.35)';const ph=k*Math.PI/3;
+  const side=(x0,y0,x1,y1,nx,ny)=>{const L=Math.hypot(x1-x0,y1-y0);for(let s=0;s<=L;s+=2){const o=12*Math.sin(s/9+ph);const x=x0+(x1-x0)*s/L+nx*o,y=y0+(y1-y0)*s/L+ny*o;s?c.lineTo(x,y):c.moveTo(x,y);}};
+  c.beginPath();side(72,72,W-72,72,0,1);c.stroke();c.beginPath();side(72,H-72,W-72,H-72,0,1);c.stroke();c.beginPath();side(72,72,72,H-72,1,0);c.stroke();c.beginPath();side(W-72,72,W-72,H-72,1,0);c.stroke();}
+ c.restore();
+ // 雙層金細線
+ c.strokeStyle=gold(0,0,W,H);c.lineWidth=3;c.strokeRect(48,48,W-96,H-96);c.lineWidth=2.5;c.strokeRect(96,96,W-192,H-192);c.lineWidth=1;c.strokeRect(104,104,W-208,H-208);
+ // 角飾
+ [[104,104,1,1],[W-104,104,-1,1],[104,H-104,1,-1],[W-104,H-104,-1,-1]].forEach(([x,y,sx,sy])=>{c.save();c.translate(x,y);c.scale(sx,sy);
+  c.fillStyle=INK;c.fillRect(-56,-56,30,30);c.fillStyle=gold(-56,-56,-26,-26);c.fillRect(-50,-50,18,18);
+  c.strokeStyle=gold(0,0,90,90);c.lineWidth=3;c.beginPath();c.moveTo(14,74);c.lineTo(14,14);c.lineTo(74,14);c.stroke();
+  c.lineWidth=1.5;c.beginPath();c.moveTo(22,52);c.quadraticCurveTo(22,22,52,22);c.stroke();dia(14,82,6,gold(8,76,20,88));dia(82,14,6,gold(76,8,88,20));dia(32,32,5,RED);c.restore();});
+ // 上方：編號、標語、日期
+ c.textBaseline='alphabetic';c.fillStyle='#6b5a3c';c.font='600 19px '+EN;sp('NO. '+serial,140,152,1.5,'left');
+ sp(`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`,W-140,152,2,'right');
+ c.fillStyle=INK;c.font='700 20px '+EN;sp('BOX 1 · NATIONAL ARCHIVES TEAM TRYOUTS',W/2,152,4,'center');
+ // 標題：燙金字＋黑色硬陰影
+ c.font='400 124px '+HU;
+ const ty=290;c.save();c.fillStyle=INK;sp('國家隊證書',W/2+6,ty+6,22,'center');c.restore();
+ c.lineJoin='round';c.lineWidth=6;c.strokeStyle=INK;{const ws=[...'國家隊證書'].map(ch=>c.measureText(ch).width);let tot=ws.reduce((a,b)=>a+b,0)+22*4,cx=W/2-tot/2;c.textAlign='left';
+  [...'國家隊證書'].forEach((ch,i)=>{c.strokeText(ch,cx,ty);cx+=ws[i]+22;});cx=W/2-tot/2;c.fillStyle=gold(W/2-tot/2,ty-110,W/2+tot/2,ty+10);[...'國家隊證書'].forEach((ch,i)=>{c.fillText(ch,cx,ty);cx+=ws[i]+22;});
+  // 左右飾線
+  const L=W/2-tot/2-40,R=W/2+tot/2+40;c.strokeStyle=gold(L-220,0,L,0);c.lineWidth=3;c.beginPath();c.moveTo(L-200,ty-44);c.lineTo(L,ty-44);c.stroke();c.lineWidth=1;c.beginPath();c.moveTo(L-160,ty-34);c.lineTo(L-10,ty-34);c.stroke();dia(L-208,ty-44,8,RED);dia(L+6,ty-44,6,INK);
+  c.strokeStyle=gold(R,0,R+220,0);c.lineWidth=3;c.beginPath();c.moveTo(R,ty-44);c.lineTo(R+200,ty-44);c.stroke();c.lineWidth=1;c.beginPath();c.moveTo(R+10,ty-34);c.lineTo(R+160,ty-34);c.stroke();dia(R+208,ty-44,8,RED);dia(R-6,ty-44,6,INK);}
+ c.textAlign='left';c.fillStyle='#8a6a1f';c.font='600 20px '+EN;sp('CERTIFICATE OF MEMBERSHIP · NATIONAL ARCHIVES TEAM',W/2,338,5,'center');
+ // 茲證明＋名字
+ c.fillStyle=INK;c.font='500 36px '+NS;sp('茲證明',W/2,420,14,'center');
+ let fs=112;c.font=`400 ${fs}px ${HU}`;while(c.measureText(name).width+6*name.length>880&&fs>56){fs-=4;c.font=`400 ${fs}px ${HU}`;}
+ c.fillStyle='rgba(35,24,21,.9)';sp(name,W/2+4,538+4,6,'center');c.fillStyle=RED;const nw=sp(name,W/2,538,6,'center');
+ const ul=Math.max(520,Math.min(860,nw+160));c.strokeStyle=gold(W/2-ul/2,0,W/2+ul/2,0);c.lineWidth=3;c.beginPath();c.moveTo(W/2-ul/2,572);c.lineTo(W/2-18,572);c.moveTo(W/2+18,572);c.lineTo(W/2+ul/2,572);c.stroke();
+ c.lineWidth=1;c.beginPath();c.moveTo(W/2-ul/2+40,581);c.lineTo(W/2+ul/2-40,581);c.stroke();dia(W/2,572,10,gold(W/2-10,562,W/2+10,582));dia(W/2,572,4,RED);
+ // 本文
+ c.fillStyle=INK;c.font='500 34px '+NS;sp('通過「檔案國家隊選拔賽」三關考驗',W/2,650,3,'center');sp('正式成為見證歷史的國家級選手',W/2,702,3,'center');
+ // 三關徽章
+ [['入隊選拔','1-1'],['國手與路人','1-2'],['小人物大時代','1-3']].forEach(([t,k],i)=>{const x=W/2+(i-1)*230,y=790;
+  c.beginPath();c.arc(x,y,36,0,7);c.fillStyle=gold(x-36,y-36,x+36,y+36);c.fill();c.lineWidth=3;c.strokeStyle=INK;c.stroke();
+  c.beginPath();c.arc(x,y,27,0,7);c.fillStyle=INK;c.fill();c.lineWidth=1.2;c.strokeStyle='#e8c96a';c.beginPath();c.arc(x,y,23,0,7);c.stroke();
+  c.strokeStyle='#F3E03B';c.lineWidth=5;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(x-11,y+1);c.lineTo(x-3,y+9);c.lineTo(x+12,y-9);c.stroke();c.lineCap='butt';
+  c.fillStyle=INK;c.font='700 23px '+NS;sp(t,x,858,2,'center');c.fillStyle='#8a6a1f';c.font='600 16px '+EN;sp('LEVEL '+k,x,884,2,'center');});
+ // 署名
+ c.strokeStyle=INK;c.lineWidth=2;c.beginPath();c.moveTo(W/2-300,912);c.lineTo(W/2+300,912);c.stroke();
+ c.fillStyle=INK;c.font='700 27px '+NS;sp('國家發展委員會檔案管理局　國家檔案館',W/2,952,3,'center');
+ c.fillStyle='#5e5549';c.font='500 19px '+NS;sp('檔案體驗箱　箱一 徵集｜檔案國家隊選拔賽',W/2,982,3,'center');
+ // 燙金章＋紅緞帶
+ const sx=W-300,sy=790;c.save();c.translate(sx,sy);
+ [[-1,.28],[1,-.28]].forEach(([s,rot])=>{c.save();c.rotate(rot);c.beginPath();c.moveTo(s*18-26,40);c.lineTo(s*18+26,40);c.lineTo(s*18+26,190);c.lineTo(s*18,166);c.lineTo(s*18-26,190);c.closePath();c.fillStyle=RED;c.fill();c.lineWidth=3;c.strokeStyle=INK;c.stroke();c.strokeStyle='rgba(247,243,232,.55)';c.lineWidth=1.5;c.beginPath();c.moveTo(s*18-17,48);c.lineTo(s*18-17,176);c.moveTo(s*18+17,48);c.lineTo(s*18+17,176);c.stroke();c.restore();});
+ c.fillStyle=INK;c.beginPath();for(let i=0;i<=96;i++){const a=i/96*Math.PI*2,r=i%2?110:122;c.lineTo(r*Math.cos(a)+5,r*Math.sin(a)+6);}c.fill();
+ c.beginPath();for(let i=0;i<=96;i++){const a=i/96*Math.PI*2,r=i%2?110:122;c.lineTo(r*Math.cos(a),r*Math.sin(a));}c.closePath();c.fillStyle=gold(-122,-122,122,122);c.fill();c.lineWidth=2.5;c.strokeStyle=INK;c.stroke();
+ c.lineWidth=1;c.strokeStyle='rgba(122,87,19,.8)';for(let i=0;i<48;i++){const a=i/48*Math.PI*2;c.beginPath();c.moveTo(78*Math.cos(a),78*Math.sin(a));c.lineTo(100*Math.cos(a),100*Math.sin(a));c.stroke();}
+ c.lineWidth=2;c.strokeStyle=INK;c.beginPath();c.arc(0,0,102,0,7);c.stroke();c.beginPath();c.arc(0,0,76,0,7);c.stroke();
+ // 環形文字
+ c.fillStyle=INK;c.font='700 15px '+EN;const ring='★ NATIONAL ARCHIVES TEAM ★ BOX 1 TRYOUTS ';const n=ring.length;[...ring].forEach((ch,i)=>{const a=-Math.PI/2+i/n*Math.PI*2;c.save();c.rotate(a);c.translate(0,-84);c.rotate(0);c.textAlign='center';c.fillText(ch,0,0);c.restore();});
+ // 中心紅印
+ c.beginPath();c.arc(0,0,68,0,7);c.fillStyle=RED;c.fill();c.lineWidth=2;c.strokeStyle=CREAM;c.beginPath();c.arc(0,0,61,0,7);c.stroke();
+ c.textAlign='center';c.fillStyle=CREAM;c.font='400 38px '+HU;c.fillText('國家級',0,-4);c.fillStyle='#F3E03B';c.font='700 32px '+EN;c.fillText('MAX!',0,36);
+ c.restore();
+ // 整體微光澤
+ c.save();g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.36,'rgba(255,255,255,0)');g.addColorStop(.46,'rgba(255,250,230,.22)');g.addColorStop(.56,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.fillRect(48,48,W-96,H-96);c.restore();
+ // 隊員
+ const im=new Image();im.onload=()=>{const hh=250,ww=im.width*hh/im.height;c.drawImage(im,250-ww/2,992-hh,ww,hh);fin();};im.onerror=fin;im.src=D.ch.done;
+ function fin(){cv.toBlob(b=>{const u=URL.createObjectURL(b);const pv=$('#cvImg');pv.src=u;pv.hidden=false;$('#dl').href=u;$('#dl').download=`檔案國家隊證書_${serial}.png`;$('#dl').hidden=false;coach('done',`恭喜 <b>${name.replace(/[<>&]/g,'')}</b> 正式入隊！`,'good');},'image/png');}};
 
 </script>
 </body>
