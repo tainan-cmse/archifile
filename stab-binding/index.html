@@ -288,7 +288,7 @@ function attempt(target){
   if (a.tool && st.tool !== a.tool){ miss(`位置對了，但這一步要用「${TOOLNAME[a.tool]}」。`); return; }
   apply(a, target);
   const done = st.i >= ACTIONS.length;
-  if (done){ st.tEnd = Date.now(); const secs = Math.round((st.tEnd - st.t0)/1000); window.ARCHI && ARCHI.log('finish', {secs, miss: st.miss, hints: st.hints, rank: st.miss === 0 && st.hints === 0 ? '裝冊老手' : st.miss + st.hints <= 3 ? '認真學徒' : '再練一次就上手'}); }
+  if (done){ st.tEnd = Date.now(); const secs = Math.round((st.tEnd - st.t0)/1000); try{localStorage.setItem('archi_stamp_3','1')}catch(e){} window.ARCHI && ARCHI.log('finish', {secs, miss: st.miss, hints: st.hints, rank: st.miss === 0 && st.hints === 0 ? '裝冊老手' : st.miss + st.hints <= 3 ? '認真學徒' : '再練一次就上手'}); }
   say(done ? '完成！線頭塞進中孔，檔案裝訂好了。' : '對了！', 'good');
   render();
 }
@@ -487,5 +487,6 @@ reset();
 })();
 </script>
 
+<script src="../quest.js"></script><script>QUEST.mount(3)</script>
 </body>
 </html>

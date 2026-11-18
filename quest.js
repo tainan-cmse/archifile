@@ -17,7 +17,23 @@
     get: function () { var k = get('archi_quest'); for (var i = 0; i < Q.length; i++) if (Q[i].k === k) return Q[i]; return null; },
     set: function (k) { set('archi_quest', k); },
     stamp: function (box) { set('archi_stamp_' + box, '1'); },
-    stamps: function () { var s = []; for (var b = 1; b <= 4; b++) s.push(get('archi_stamp_' + b) === '1'); return s; },
+    stamps: function () {
+      var s = []; for (var b = 1; b <= 4; b++) s.push(get('archi_stamp_' + b) === '1');
+      if (get('box1_lv1') === '1' && get('box1_lv2') === '1' && get('box1_lv3') === '1') s[0] = true;
+      return s;
+    },
+    // 在箱一、箱三頁面上方放一條「我的檔案任務」提示
+    mount: function (box) {
+      var q = this.get(); if (!q) return;
+      var line = { 1: '這一箱，看看像它這樣的檔案，怎麼通過層層選拔成為國家檔案。', 3: '這一箱，看看檔案受損時，修護師怎麼把它救回來。原件修好了，大家才能一直申請使用它。' }[box] || '';
+      var el = document.createElement('div');
+      el.style.cssText = 'max-width:980px;margin:0 auto 14px;background:#fff;border:3px solid #1b1714;box-shadow:4px 4px 0 #1b1714;padding:8px 14px;font:700 14px/1.6 "Noto Sans TC",sans-serif;color:#1b1714';
+      el.innerHTML = '<span style="background:#1b1714;color:#f3e03b;padding:0 8px;margin-right:6px">我的檔案任務</span>' + q.q +
+        '　你的檔案選手：<b style="color:#c8322a">' + q.a + '</b><br><span style="font-weight:500">' + line + '</span>' +
+        ' <a href="https://tainan-cmse.github.io/archifile/#mission" style="color:#c8322a">看四箱護照 ›</a>';
+      var w = document.querySelector('.wrap') || document.body;
+      w.parentNode.insertBefore(el, w);
+    },
     plan: function (o) { if (o === undefined) { try { return JSON.parse(get('archi_plan') || 'null'); } catch (e) { return null; } } set('archi_plan', JSON.stringify(o)); }
   };
 })();

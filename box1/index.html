@@ -282,5 +282,6 @@ $('#mk').onclick=async()=>{const name=($('#nm').value.trim()||'檔案小隊員')
  function fin(){cv.toBlob(b=>{const u=URL.createObjectURL(b);const pv=$('#cvImg');pv.src=u;pv.hidden=false;$('#dl').href=u;$('#dl').download=`檔案國家隊證書_${serial}.png`;$('#dl').hidden=false;if(window.ARCHI&&ARCHI.on){const sh=$('#share').checked&&$('#nm').value.trim();ARCHI.log('cert',{shared:sh?'是':'否'});if(sh)ARCHI.share('cert_name',sh).then(ok=>{if(ok){$('#sentMsg').textContent='已匿名送出，歡迎入隊！';$('#sentMsg').hidden=false;}});}coach('done',`恭喜 <b>${name.replace(/[<>&]/g,'')}</b> 正式入隊！`,'good');},'image/png');}};
 
 </script>
+<script src="../quest.js"></script><script>QUEST.mount(1)</script>
 </body>
 </html>

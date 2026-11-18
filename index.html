@@ -66,6 +66,23 @@ section.box{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;bord
 footer{font-size:13px;color:var(--muted);border-top:3px solid var(--ink);padding-top:12px;display:flex;flex-wrap:wrap;gap:6px 18px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 h1,.boxhead h2,.card h3{font-family:var(--f-display);font-weight:400!important}
+.mission{background:var(--paper-2);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
+.mission h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(26px,5vw,36px);letter-spacing:.06em}
+.mission p{margin:0;max-width:40em}
+.mq{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.mq button{font:inherit;color:inherit;text-align:left;border:2.5px solid var(--ink);background:#fff;padding:8px 10px;display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;align-items:center;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+.mq button b{font-size:15px;line-height:1.35;display:block} .mq button small{font-size:12px;color:var(--muted)}
+.mq button[aria-pressed="true"]{background:var(--yellow)}
+.route{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media(max-width:700px){.route{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.route a{position:relative;text-decoration:none;color:var(--ink);border:2.5px solid var(--ink);background:#fff;padding:10px 54px 10px 10px;display:flex;flex-direction:column;gap:2px;min-height:96px}
+.route a b{font-size:16px} .route a small{font-size:12.5px;color:var(--muted);line-height:1.4}
+.route a .no{font-family:var(--f-en);font-weight:700;font-size:12px;color:var(--red);letter-spacing:.06em}
+.route a .st{position:absolute;right:6px;top:6px;width:44px;height:44px;border-radius:50%;border:2.5px dashed #bcb39c;display:grid;place-items:center;font-size:11px;font-weight:900;color:#bcb39c;transform:rotate(-8deg)}
+.route a.on .st{border:3px solid var(--red);color:var(--red);background:#fff}
+.myplan{border:2.5px dashed var(--ink);background:#fffbd6;padding:10px 14px;font-weight:700}
+.myplan a{color:var(--red)}
+
 </style>
 
 <div class="wrap">
@@ -88,6 +105,16 @@ h1,.boxhead h2,.card h3{font-family:var(--f-display);font-weight:400!important}
     <a href="#box3" data-f="box3"><b>03</b>修護</a>
     <a href="#box4" data-f="box4"><b>04</b>應用</a>
   </nav>
+
+
+  <section class="mission" id="mission" aria-labelledby="h-mission">
+    <span class="kicker">My Archive Mission · 學會應用國家檔案</span>
+    <h2 id="h-mission">我的檔案任務</h2>
+    <p>挑一個你想知道的問題，我們幫你配一份能回答它的「檔案選手」。跟著它走過四個箱子：看它入選、入住、被修好，最後由你親手把它<b>申請出來</b>、做成作品！</p>
+    <div class="mq" id="mq"></div>
+    <div class="route" id="route"></div>
+    <div id="myplan"></div>
+  </section>
 
   <section class="box" data-box="box1" aria-labelledby="h-box1">
     <div class="boxhead"><div class="boxno">BOX<span>01</span></div><h2 id="h-box1">箱一</h2><span class="theme">徵集</span></div>
@@ -166,6 +193,23 @@ h1,.boxhead h2,.card h3{font-family:var(--f-display);font-weight:400!important}
 </div>
 
 <script src="./collect.js"></script>
+<script src="./quest.js"></script>
+<script>
+(() => {
+  const QIC = {"map": "<svg viewBox=\"0 0 64 64\" width=\"100%\" aria-hidden=\"true\"><path d=\"M6 14l16-6 20 6 16-6v42l-16 6-20-6-16 6z\" fill=\"#efe1c4\" stroke=\"#231815\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M22 8v42M42 14v42\" fill=\"none\" stroke=\"#231815\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M12 30c6-4 10 4 16 0s10-6 14-2 8 2 10 0\" stroke=\"#3A8FD6\" stroke-width=\"3\" fill=\"none\"/><circle cx=\"34\" cy=\"38\" r=\"4\" fill=\"#C8322A\" stroke=\"#231815\" stroke-width=\"2\"/></svg>", "doc": "<svg viewBox=\"0 0 64 64\" width=\"100%\" aria-hidden=\"true\"><path d=\"M14 6h26l10 10v42H14z\" fill=\"#fff\" stroke=\"#231815\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M40 6v10h10\" fill=\"none\" stroke=\"#231815\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 24h20M21 31h20M21 38h12\" fill=\"none\" stroke=\"#231815\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><rect x=\"34\" y=\"44\" width=\"10\" height=\"7\" fill=\"#C8322A\"/></svg>", "photo": "<svg viewBox=\"0 0 64 64\" width=\"100%\" aria-hidden=\"true\"><rect x=\"6\" y=\"12\" width=\"52\" height=\"40\" fill=\"#fff\" stroke=\"#231815\" stroke-width=\"3\"/><rect x=\"12\" y=\"18\" width=\"40\" height=\"26\" fill=\"#BCB39C\" stroke=\"#231815\" stroke-width=\"2.5\"/><path d=\"M12 40l12-12 8 8 6-6 14 12\" fill=\"#F7F3E8\" stroke=\"#231815\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><circle cx=\"44\" cy=\"25\" r=\"4\" fill=\"#F3E03B\" stroke=\"#231815\" stroke-width=\"2\"/></svg>", "blue": "<svg viewBox=\"0 0 64 64\" width=\"100%\" aria-hidden=\"true\"><rect x=\"6\" y=\"10\" width=\"52\" height=\"44\" fill=\"#2f6fb3\" stroke=\"#231815\" stroke-width=\"3\"/><path d=\"M14 44h36M14 44V22M22 44V30h20v14M32 22v8\" stroke=\"#fff\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M6 18h8\" stroke=\"#231815\" stroke-width=\"3\"/></svg>", "tape": "<svg viewBox=\"0 0 64 64\" width=\"100%\" aria-hidden=\"true\"><rect x=\"4\" y=\"16\" width=\"56\" height=\"32\" rx=\"3\" fill=\"#231815\" stroke=\"#231815\" stroke-width=\"3\"/><rect x=\"12\" y=\"22\" width=\"40\" height=\"14\" fill=\"#fff\" stroke=\"#231815\" stroke-width=\"2\"/><circle cx=\"22\" cy=\"29\" r=\"5\" fill=\"#BCB39C\" stroke=\"#231815\" stroke-width=\"2\"/><circle cx=\"42\" cy=\"29\" r=\"5\" fill=\"#BCB39C\" stroke=\"#231815\" stroke-width=\"2\"/><rect x=\"18\" y=\"40\" width=\"28\" height=\"4\" fill=\"#C8322A\"/></svg>"};
+  const R = 'https://tainan-cmse.github.io/archifile/';
+  const steps = [['箱一 徵集','看它入選','三關選拔賽，看檔案怎麼成為國家隊。',R+'box1/'],['箱二 保存','看它入住','除蟲、換裝、找對櫃子，住進選手村。',R+'box2/'],['箱三 修護','看它被修好','當一次修護師，把受損的檔案救回來。',R+'paper-repair/'],['箱四 應用','把它申請出來','走一次申請五步驟，把檔案變成作品。',R+'box4/']];
+  function draw(){
+    const q = QUEST.get(), st = QUEST.stamps();
+    document.getElementById('mq').innerHTML = QUEST.list.map(x => `<button aria-pressed="${!!(q&&q.k===x.k)}" data-q="${x.k}"><span>${QIC[x.ic]}</span><span><b>${x.q}</b><small>檔案選手：${x.a}</small></span></button>`).join('');
+    document.querySelectorAll('#mq button').forEach(b => b.onclick = () => { QUEST.set(b.dataset.q); draw(); });
+    document.getElementById('route').innerHTML = steps.map((s,i) => `<a href="${s[3]}" class="${st[i]?'on':''}"><span class="no">STEP ${i+1}・${s[0]}</span><b>${q?s[1].replace('它','你的'+q.a):s[1]}</b><small>${s[2]}</small><span class="st">${st[i]?'已蓋章':'護照'}</span></a>`).join('');
+    const p = QUEST.plan();
+    document.getElementById('myplan').innerHTML = p ? `<div class="myplan">我的檔案應用計畫：用「${p.a}」做成「${p.wk}」（${p.th}）。準備好了嗎？<a href="https://aa.archives.gov.tw/" target="_blank" rel="noopener">到國家檔案資訊網 A+ 查查看 ↗</a></div>` : '';
+  }
+  draw();
+})();
+</script>
 <script>
 (() => {
   const keys = ['box1','box2','box3','box4'];

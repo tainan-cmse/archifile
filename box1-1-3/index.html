@@ -267,5 +267,6 @@ $('#certBtn').onclick=()=>{const t=$('#story').value.trim();$('#certTxt').textCo
  if(t&&window.ARCHI&&ARCHI.on&&$('#share').checked){ARCHI.share('story',t).then(ok=>{if(ok){$('#sentMsg').textContent='已匿名送出，謝謝你分享！';$('#sentMsg').hidden=false;}});}};
 $('#again').onclick=()=>location.reload();
 </script>
+<script src="../quest.js"></script><script>QUEST.mount(1)</script>
 </body>
 </html>

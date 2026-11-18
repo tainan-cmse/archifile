@@ -384,5 +384,6 @@ function askForm(){$$('.sil').forEach((s,i)=>s.classList.toggle('cur',i===fi));c
   if(fi<forms.length)setTimeout(askForm,700);else{$$('.sil').forEach(s=>s.classList.remove('cur'));$('#choices').innerHTML='';$('#l4q').hidden=true;$('#l4ans').hidden=false;coach('done','五種面貌全猜中！國家檔案不只有紙本喔。','good');}});}
 
 </script>
+<script src="../quest.js"></script><script>QUEST.mount(1)</script>
 </body>
 </html>
