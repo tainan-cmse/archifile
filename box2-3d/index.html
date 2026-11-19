@@ -161,6 +161,8 @@ h1,h2,h3,.stamp,.titleblock h1{font-family:var(--round);font-weight:400!importan
 @media(max-width:640px){.grp{grid-template-columns:1fr}}
 .grp>div{border:3px solid var(--ink);background:#fff;box-shadow:4px 4px 0 var(--ink);padding:10px}
 .grp h4{margin:0 0 6px;font-size:17px} .grp ul{margin:0;padding-left:1.2em;font-size:14px;line-height:1.7}
+.photos{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;max-width:720px;margin:0 auto}@media(max-width:640px){.photos{grid-template-columns:1fr}}
+.photos figure{margin:0;border:3px solid var(--ink);background:#fff;box-shadow:4px 4px 0 var(--ink)} .photos img{display:block;width:100%;height:auto} .photos figcaption{padding:8px 10px;font-size:14px;font-weight:700;line-height:1.5}
 .nogl{padding:30px;text-align:center;font-weight:700}
 
 </style>
@@ -226,23 +228,46 @@ const got=new Set();let bx=448,by=290,vx=0,vy=0,ax=0,ay=0,pt=null,keys={},run=fa
 $('#got').innerHTML=D.eq.map(e=>`<div id="g${e.n}"><div>${e.svg}</div>${e.n}</div>`).join('');
 const NOTE={'3d':'立體視角：像走進庫房一樣，鏡頭跟著鋼珠','plan':'平面視角：從天花板「往下看」，就是平面圖','elev':'立面視角：把庫房從前面「切開」來看，看得出設備裝多高'};
 // ---------- 3D 場景 ----------
-const host=$('#v3');let rd,scene,cam3,camP,camE,ballM,shadowM,holeM={},flagG={},iconS={},ceilG,shelfMats=[],deskMats=[],floorM;
+const host=$('#v3');let rd,scene,cam3,camP,camE,ballM,shadowM,holeM={},flagG={},iconS={},ceilG,shelfMats=[],shelfMesh=[],slideT=0,deskMats=[],floorM,ledG,ductG,amb;
+function paintFloor(c,red){c.fillStyle=red?'#d9572f':'#d8d1bf';c.fillRect(0,0,1020,660);
+ if(red){const g=c.createLinearGradient(0,0,1020,660);g.addColorStop(0,'rgba(255,255,255,.18)');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(255,255,255,.12)');c.fillStyle=g;c.fillRect(0,0,1020,660);}
+ else{c.strokeStyle='rgba(35,24,21,.07)';c.lineWidth=2;for(let x=0;x<1020;x+=40){c.beginPath();c.moveTo(x,0);c.lineTo(x,660);c.stroke();}}
+ // 密集櫃軌道（櫃子沿軌道左右移動）
+ c.strokeStyle=red?'#9a9a96':'#8a8270';c.lineWidth=4;[70,150,230,310,350].slice(0,0).forEach(y=>{c.beginPath();c.moveTo(30,y);c.lineTo(770,y);c.stroke();});
+ c.fillStyle=red?'rgba(255,255,255,.55)':'rgba(35,24,21,.35)';c.font='900 30px "Noto Sans TC",sans-serif';c.textAlign='center';c.textBaseline='middle';D.lab.forEach(l=>c.fillText(l[0],l[1]*2,l[2]*2));
+ c.fillStyle='#c8322a';c.fillRect(388*2,250*2,12,110);}
+// 密集櫃貼圖：端板（散熱孔＋黑色三輻轉輪＋綠色編號牌）、側面（層板＋檔案盒）
+function endTex(no,wheel){return canvasTex(96,184,c=>{c.fillStyle='#ece6d6';c.fillRect(0,0,96,184);c.strokeStyle='#231815';c.lineWidth=3;c.strokeRect(2,2,92,180);
+ c.fillStyle='rgba(35,24,21,.45)';for(let y=34;y<76;y+=6)for(let x=14;x<84;x+=6)c.fillRect(x,y,2.4,2.4);for(let y=132;y<176;y+=6)for(let x=14;x<84;x+=6)c.fillRect(x,y,2.4,2.4);
+ c.fillStyle='#d3f0c8';c.fillRect(26,10,44,16);c.strokeStyle='#4c8a3c';c.lineWidth=2;c.strokeRect(26,10,44,16);c.fillStyle='#231815';c.font='700 12px "IBM Plex Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(no,48,18.5);
+ if(wheel){c.strokeStyle='#231815';c.lineWidth=6;c.beginPath();c.arc(48,104,19,0,7);c.stroke();c.lineWidth=5;for(let k=0;k<3;k++){const a=k*2.094-1.57;c.beginPath();c.moveTo(48,104);c.lineTo(48+Math.cos(a)*18,104+Math.sin(a)*18);c.stroke();}c.fillStyle='#231815';c.beginPath();c.arc(48,104,5,0,7);c.fill();}});}
+function sideTex(){return canvasTex(560,184,c=>{c.fillStyle='#ece6d6';c.fillRect(0,0,560,184);const bays=4,bw=560/bays;
+ for(let lv=0;lv<5;lv++){const y0=8+lv*35;for(let b=0;b<bays;b++){for(let i=0;i<9;i++){const x=b*bw+8+i*14.5;c.fillStyle=i%3===1?'#e8d2a6':'#efdcb4';c.fillRect(x,y0+4,13,27);c.fillStyle='#fff';c.fillRect(x+3,y0+8,7,9);}}
+  c.fillStyle='#cfc7b2';c.fillRect(0,y0+31,560,4);}
+ c.strokeStyle='#231815';c.lineWidth=3;for(let b=0;b<=bays;b++){c.beginPath();c.moveTo(b*bw,0);c.lineTo(b*bw,184);c.stroke();}c.strokeRect(1.5,1.5,557,181);});}
 function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;}
 function edge(mesh){const e=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:0x231815}));mesh.add(e);return mesh;}
 function build(){
  rd=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});rd.setPixelRatio(Math.min(2,window.devicePixelRatio||1));rd.setClearColor(0xf6f1e3);host.appendChild(rd.domElement);
  scene=new THREE.Scene();
- scene.add(new THREE.AmbientLight(0xffffff,.62));const dl=new THREE.DirectionalLight(0xffffff,.55);dl.position.set(-200,400,300);scene.add(dl);
+ amb=new THREE.AmbientLight(0xffffff,.6);scene.add(amb);const dl=new THREE.DirectionalLight(0xffffff,.55);dl.position.set(-200,400,300);scene.add(dl);
  // 地板（環氧樹脂地坪收集後變亮綠灰）
- floorM=new THREE.MeshLambertMaterial({map:canvasTex(1020,660,c=>{c.fillStyle='#e9e2cf';c.fillRect(0,0,1020,660);c.strokeStyle='rgba(35,24,21,.08)';c.lineWidth=2;for(let x=0;x<1020;x+=40){c.beginPath();c.moveTo(x,0);c.lineTo(x,660);c.stroke();}
-  c.fillStyle='rgba(35,24,21,.35)';c.font='900 30px "Noto Sans TC",sans-serif';c.textAlign='center';c.textBaseline='middle';D.lab.forEach(l=>c.fillText(l[0],l[1]*2,l[2]*2));
-  c.fillStyle='#c8322a';c.fillRect(388*2,250*2,12,110);})});
+ floorM=new THREE.MeshLambertMaterial({map:canvasTex(1020,660,c=>paintFloor(c,false))});
  const base=edge(new THREE.Mesh(new THREE.BoxGeometry(W,6,H),new THREE.MeshLambertMaterial({color:0x3d3530})));base.position.set(W/2,-3.05,H/2);scene.add(base);
  const fl=new THREE.Mesh(new THREE.PlaneGeometry(W,H),floorM);fl.rotation.x=-Math.PI/2;fl.position.set(W/2,0,H/2);scene.add(fl);
- const COL={w:0xf4ecd6,f:0x8a8270,s:0xbcb39c,d:0xc9b083};
- D.box.forEach(b=>{const [x0,y0,x1,y1,h,k]=b;const m=new THREE.MeshLambertMaterial({color:COL[k],transparent:true,opacity:1});if(k==='s')shelfMats.push(m);if(k==='d')deskMats.push(m);
-  const me=edge(new THREE.Mesh(new THREE.BoxGeometry(x1-x0,h,y1-y0),m));me.position.set((x0+x1)/2,h/2,(y0+y1)/2);me.userData.k=k;scene.add(me);
-  if(k==='s'){for(let z=10;z<h;z+=12){const sh=new THREE.Mesh(new THREE.BoxGeometry(x1-x0+2,1.6,y1-y0+2),new THREE.MeshLambertMaterial({color:0x8a8270}));sh.position.set((x0+x1)/2,z,(y0+y1)/2);scene.add(sh);}}});
+ const COL={w:0xf7f4ec,f:0xc0492b,s:0xbcb39c,d:0xc9b083};
+ const ST=sideTex();let si=0;
+ D.box.forEach(b=>{const [x0,y0,x1,y1,h,k]=b;let m;
+  if(k==='s'){si++;const L=n=>new THREE.MeshLambertMaterial({map:n,transparent:true,opacity:1}),side=L(ST),top=new THREE.MeshLambertMaterial({color:0xece6d6,transparent:true,opacity:1});
+   m=[side,side,top,top,L(endTex((30+si)+'A',true)),L(endTex((30+si)+'B',false))];shelfMats.push(...m);}
+  else{m=new THREE.MeshLambertMaterial({color:COL[k],transparent:true,opacity:1});if(k==='d')deskMats.push(m);}
+  const me=edge(new THREE.Mesh(new THREE.BoxGeometry(x1-x0,h,y1-y0),m));me.position.set((x0+x1)/2,h/2,(y0+y1)/2);me.userData.k=k;me.userData.x=(x0+x1)/2;if(k==='s')shelfMesh.push(me);scene.add(me);});
+ railG=new THREE.Group();const rm=new THREE.MeshPhongMaterial({color:0x9ea3a8,specular:0xffffff,shininess:60});[35,75,115,155,175].forEach(z=>{const r=new THREE.Mesh(new THREE.BoxGeometry(372,1.2,2.2),rm);r.position.set(204,.6,z);railG.add(r);});scene.add(railG);
+ // 天花板設備：LED 燈管（收集 08 後亮起）、空調風管（收集 10 後出現）
+ ledG=new THREE.Group();for(let i=0;i<8;i++){const x=40+i*52;const t=new THREE.Mesh(new THREE.BoxGeometry(1.6,1,110),new THREE.MeshBasicMaterial({color:0xfffff2}));t.position.set(x,CEIL-1,115);ledG.add(edge(t));}
+ for(let i=0;i<3;i++){const t=new THREE.Mesh(new THREE.BoxGeometry(100,1,1.6),new THREE.MeshBasicMaterial({color:0xfffff2}));t.position.set(70+i*130,CEIL-1,262);ledG.add(edge(t));}ledG.visible=false;scene.add(ledG);
+ ductG=new THREE.Group();const dm=new THREE.MeshLambertMaterial({color:0xd8dde2});const du=edge(new THREE.Mesh(new THREE.BoxGeometry(360,5,7),dm));du.position.set(205,CEIL-4,22);ductG.add(du);
+ for(let i=0;i<4;i++){const v=edge(new THREE.Mesh(new THREE.BoxGeometry(10,3,10),new THREE.MeshLambertMaterial({color:0x8a9096})));v.position.set(60+i*100,CEIL-8,22);ductG.add(v);}ductG.visible=false;scene.add(ductG);
  // 天花板：只畫格線，讓「天」的設備有地方掛
  ceilG=new THREE.Group();const lm=new THREE.LineBasicMaterial({color:0x8a8270,transparent:true,opacity:.45});
  for(let x=8;x<=502;x+=38){const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x,CEIL,8),new THREE.Vector3(x,CEIL,322)]);ceilG.add(new THREE.Line(g,lm));}
@@ -275,13 +300,13 @@ function resize(){if(!rd)return;const w=host.clientWidth,h=host.clientHeight;rd.
  let hw=W/2+12,hh=H/2+12;if(hw/hh<a)hw=hh*a;else hh=hw/a;Object.assign(camP,{left:-hw,right:hw,top:hh,bottom:-hh});camP.position.set(W/2,600,H/2);camP.up.set(0,0,-1);camP.lookAt(W/2,0,H/2);camP.updateProjectionMatrix();
  const ew=135,eh=Math.max((CEIL+30)/2,ew/a);Object.assign(camE,{left:-ew,right:ew,top:eh,bottom:-eh});camE.userData.ew=ew;camE.updateProjectionMatrix();if(scene&&ballM)render();}
 function setView(v){view=v;$$('.vbtn [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('#vnote').className='vnote '+v;$('#vnote').textContent=NOTE[v];
- $('#rot').disabled=v!=='3d';ceilG.visible=v!=='plan';shelfMats.concat(deskMats).forEach(m=>{m.opacity=v==='elev'?.3:1;m.depthWrite=v!=='elev';});Object.values(flagG).forEach(g=>g.visible=v!=='elev');
+ $('#rot').disabled=v!=='3d';ceilG.visible=v!=='plan';if(ledG){ledG.userData.v=v;}shelfMats.concat(deskMats).forEach(m=>{m.opacity=v==='elev'?.3:1;m.depthWrite=v!=='elev';});Object.values(flagG).forEach(g=>g.visible=v!=='elev');
  scene.children.forEach(o=>{if(o.userData.k==='f')o.visible=v!=='elev';});
  const tip={'plan':'這就是平面圖！天花板的設備從上面看，只剩一個個點。','elev':'這就是立面圖！看得出哪些設備<b>掛在天花板</b>、哪些<b>固定在牆上</b>、哪些<b>放在地上</b>。','3d':'回到立體視角，繼續找設備！'}[v];
  if(run)coach('idle',tip);}
 $$('.vbtn [data-v]').forEach(b=>b.onclick=()=>setView(b.dataset.v));
 $('#rot').onclick=()=>{yawT+=Math.PI/2;};
-function render(){yaw+=(yawT-yaw)*.12;const tx=bx,tz=by;
+function render(){if(ledG){ledG.visible=!!ledG.userData.on&&view!=='plan';ductG.visible=!!ductG.userData.on&&view!=='plan';}yaw+=(yawT-yaw)*.12;if(slideT){const u=(performance.now()-slideT)/2600;if(u>=1){slideT=0;shelfMesh.forEach(m=>m.position.x=m.userData.x);}else{const k=Math.sin(u*Math.PI);shelfMesh.forEach((m,i)=>m.position.x=m.userData.x+(3-i)*k*11);}}const tx=bx,tz=by;
  ballM.position.set(bx,R,by);ballM.rotation.z-=vx*.08;ballM.rotation.x+=vy*.08;shadowM.position.set(bx+1.5,.4,by+1.5);
  if(view==='3d'){const d=165,hgt=175;cam3.position.set(tx+Math.sin(yaw)*d,hgt,tz+Math.cos(yaw)*d);cam3.lookAt(tx,0,tz-18*Math.cos(yaw));rd.render(scene,cam3);}
  else if(view==='plan')rd.render(scene,camP);
@@ -321,9 +346,10 @@ function step(t){if(!run)return;const dt=Math.min(32,t-last)/16;last=t;
  D.eq.forEach(e=>{if(got.has(e.n))return;if(Math.hypot(bx-e.h[0],by-e.h[1])<8){got.add(e.n);vx*=.15;vy*=.15;collect(e);}});
  render();drawPlan();requestAnimationFrame(step);}
 function collect(e){$('#g'+e.n).classList.add('on');holeM[e.n].material.color.set(0xf3e03b);iconSprite(e);
- if(e.n==='12')floorM.color.set(0xd6ead9);
- const cs=[...e.c];
- $('#pop').innerHTML=`<span class="e">${e.svg}</span><div><b>${e.n}　${e.zh}</b><br>${cs.map(c=>`<span class="chip" style="background:${CAT[c][0]};color:${CAT[c][1]}">${c}</span>`).join('')}<small>裝在${cs.map(c=>CAT[c][2]).join('、')}${cs[0]==='天'?'，抬頭才看得到':(cs[0]==='壁'?'，固定在牆面上':'，放在地上')}</small></div>`;
+ if(e.n==='12'){paintFloor(floorM.map.image.getContext('2d'),true);floorM.map.needsUpdate=true;}
+ if(e.n==='08'){ledG.userData.on=1;amb.intensity=.66;}if(e.n==='10')ductG.userData.on=1;if(e.n==='03')slideT=performance.now();
+ const cs=[...e.c],xtra={'12':'看！地板變成橘紅色的環氧樹脂地坪：耐磨、不起灰塵。','08':'天花板的燈管亮起來了，無紫外線，不會傷害檔案。','10':'天花板出現空調出風、回風管，24 小時控制溫濕度。','03':'密集式檔案架：轉動黑色轉輪，櫃子就會沿著地上的軌道移動。'}[e.n]||'';
+ $('#pop').innerHTML=`<span class="e">${e.svg}</span><div><b>${e.n}　${e.zh}</b><br>${cs.map(c=>`<span class="chip" style="background:${CAT[c][0]};color:${CAT[c][1]}">${c}</span>`).join('')}<small>裝在${cs.map(c=>CAT[c][2]).join('、')}${cs[0]==='天'?'，抬頭才看得到':(cs[0]==='壁'?'，固定在牆面上':'，放在地上')}${xtra?'<br>'+xtra:''}</small></div>`;
  coach('good',`找到第 ${got.size} 項：<b>${e.zh}</b>！它出現在${cs.map(c=>CAT[c][2]).join('和')}。${got.size===3?'切到<b>立面視角</b>看看，設備裝多高一看就懂。':''}`,'good');
  if(window.ARCHI)ARCHI.log('eq',{n:e.n});if(got.size===12)setTimeout(finish,700);}
 function finish(){if(fin)return;fin=true;run=false;window.removeEventListener('deviceorientation',onOri);setView('elev');render();drawPlan();
@@ -335,6 +361,7 @@ function finish(){if(fin)return;fin=true;run=false;window.removeEventListener('d
   <div><h4><i class="chip" style="background:#231815;color:#f3e03b">地</i>立地放置</h4><ul>${g('地')}</ul></div>
   <div><h4><i class="chip" style="background:#c8322a;color:#fff">壁</i>與牆面固定</h4><ul>${g('壁')}</ul></div></div>
   <p class="text">錄影監視設備可以吊在天花板，也可以固定在牆上，所以同時屬於「天」和「壁」。</p>
+  <h3 style="margin:10px 0 6px">真的國家檔案庫房長這樣</h3><div class="photos"><figure><img src="photo1.jpg" alt="國家檔案庫房：橘紅色環氧樹脂地坪與密集式檔案架"><figcaption>橘紅色的環氧樹脂地坪、天花板的 LED 燈管，還有一排排裝著黑色轉輪的密集式檔案架。</figcaption></figure></div>
   <div class="row" style="justify-content:center"><button class="btn" id="again">再玩一次</button><a class="btn big" style="text-decoration:none" href="${D.ROOT}box4/">前往箱四：把檔案申請出來 ▶</a><a class="btn" style="text-decoration:none" href="${D.ROOT}box2/">回箱二選手村</a><a class="btn" style="text-decoration:none" href="${D.ROOT}#box2">回線上任務首頁</a></div>`;
  $('#again').onclick=()=>location.reload();}
 function start(){$('#intro').hidden=true;$('#game').hidden=false;
