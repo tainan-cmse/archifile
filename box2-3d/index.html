@@ -229,7 +229,7 @@ $('#got').innerHTML=D.eq.map(e=>`<div id="g${e.n}"><div>${e.svg}</div>${e.n}</di
 const NOTE={'3d':'立體視角：像走進庫房一樣，鏡頭跟著鋼珠','plan':'平面視角：從天花板「往下看」，就是平面圖','elev':'立面視角：把庫房從前面「切開」來看，看得出設備裝多高'};
 // ---------- 3D 場景 ----------
 const host=$('#v3');let rd,scene,cam3,camP,camE,ballM,shadowM,holeM={},flagG={},iconS={},ceilG,shelfMats=[],shelfMesh=[],slideT=0,deskMats=[],floorM,ledG,ductG,amb;
-function paintFloor(c,red){c.fillStyle=red?'#d9572f':'#d8d1bf';c.fillRect(0,0,1020,660);
+function paintFloor(c,red){c.fillStyle=red?'#ef8e7e':'#d8d1bf';c.fillRect(0,0,1020,660);
  if(red){const g=c.createLinearGradient(0,0,1020,660);g.addColorStop(0,'rgba(255,255,255,.18)');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(255,255,255,.12)');c.fillStyle=g;c.fillRect(0,0,1020,660);}
  else{c.strokeStyle='rgba(35,24,21,.07)';c.lineWidth=2;for(let x=0;x<1020;x+=40){c.beginPath();c.moveTo(x,0);c.lineTo(x,660);c.stroke();}}
  // 密集櫃軌道（櫃子沿軌道左右移動）
@@ -242,8 +242,8 @@ function endTex(no,wheel){return canvasTex(96,184,c=>{c.fillStyle='#ece6d6';c.fi
  c.fillStyle='#d3f0c8';c.fillRect(26,10,44,16);c.strokeStyle='#4c8a3c';c.lineWidth=2;c.strokeRect(26,10,44,16);c.fillStyle='#231815';c.font='700 12px "IBM Plex Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(no,48,18.5);
  if(wheel){c.strokeStyle='#231815';c.lineWidth=6;c.beginPath();c.arc(48,104,19,0,7);c.stroke();c.lineWidth=5;for(let k=0;k<3;k++){const a=k*2.094-1.57;c.beginPath();c.moveTo(48,104);c.lineTo(48+Math.cos(a)*18,104+Math.sin(a)*18);c.stroke();}c.fillStyle='#231815';c.beginPath();c.arc(48,104,5,0,7);c.fill();}});}
 function sideTex(){return canvasTex(560,184,c=>{c.fillStyle='#ece6d6';c.fillRect(0,0,560,184);const bays=4,bw=560/bays;
- for(let lv=0;lv<5;lv++){const y0=8+lv*35;for(let b=0;b<bays;b++){for(let i=0;i<9;i++){const x=b*bw+8+i*14.5;c.fillStyle=i%3===1?'#e8d2a6':'#efdcb4';c.fillRect(x,y0+4,13,27);c.fillStyle='#fff';c.fillRect(x+3,y0+8,7,9);}}
-  c.fillStyle='#cfc7b2';c.fillRect(0,y0+31,560,4);}
+ for(let lv=0;lv<6;lv++){const y0=6+lv*29.5;for(let b=0;b<bays;b++){for(let i=0;i<9;i++){const x=b*bw+8+i*14.5;c.fillStyle=i%3===1?'#e8d2a6':'#efdcb4';c.fillRect(x,y0+3,13,23);c.fillStyle='#fff';c.fillRect(x+3,y0+6,7,8);}}
+  c.fillStyle='#cfc7b2';c.fillRect(0,y0+26,560,3.5);}
  c.strokeStyle='#231815';c.lineWidth=3;for(let b=0;b<=bays;b++){c.beginPath();c.moveTo(b*bw,0);c.lineTo(b*bw,184);c.stroke();}c.strokeRect(1.5,1.5,557,181);});}
 function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'));const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t;}
 function edge(mesh){const e=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:0x231815}));mesh.add(e);return mesh;}
@@ -281,20 +281,121 @@ function build(){
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(128,80,c=>{c.fillStyle=c1[0];c.fillRect(0,0,128,80);if(c2!==c1){c.fillStyle=c2[0];c.beginPath();c.moveTo(128,0);c.lineTo(128,80);c.lineTo(0,80);c.fill();}
    c.lineWidth=8;c.strokeStyle='#231815';c.strokeRect(4,4,120,72);c.fillStyle=c2!==c1?'#231815':c1[1];c.font='900 46px "IBM Plex Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';
    if(c2!==c1){c.fillStyle='#fff';c.fillRect(34,18,60,44);c.fillStyle='#231815';}c.fillText(e.n,64,42);})}));
-  sp.scale.set(20,12.5,1);sp.position.set(10,28,0);g.add(sp);g.position.set(e.f[0],0,e.f[1]);scene.add(g);flagG[e.n]=g;});
+  sp.scale.set(20,12.5,1);let ox=10,fs=1;if(rectHit(e.f[0]+1,e.f[0]+21,e.f[1]-2,e.f[1]+2,20)){ox=-10;if(rectHit(e.f[0]-21,e.f[0]-1,e.f[1]-2,e.f[1]+2,20)){ox=0;fs=Math.min(1,(clearAt(e.f[0],e.f[1],20)*2-2)/20);}}sp.scale.set(20*fs,12.5*fs,1);sp.position.set(ox,28,0);g.add(sp);g.position.set(e.f[0],0,e.f[1]);scene.add(g);flagG[e.n]=g;});
  // 鋼珠＋影子
  ballM=new THREE.Mesh(new THREE.SphereGeometry(R,24,16),new THREE.MeshPhongMaterial({color:0xc4c9cf,specular:0xffffff,shininess:90}));scene.add(ballM);
  shadowM=new THREE.Mesh(new THREE.CircleGeometry(R*1.1,20),new THREE.MeshBasicMaterial({color:0x231815,transparent:true,opacity:.25}));shadowM.rotation.x=-Math.PI/2;scene.add(shadowM);
  cam3=new THREE.PerspectiveCamera(48,1,1,3000);camP=new THREE.OrthographicCamera(-1,1,1,-1,1,3000);camE=new THREE.OrthographicCamera(-1,1,1,-1,1,3000);
+ buildEquip();
  resize();new ResizeObserver(resize).observe(host);}
-function iconSprite(e){// 收集後，設備圖示出現在它真正的高度
- const t=canvasTex(240,200,c=>{c.fillStyle='#fffaf0';c.strokeStyle='#231815';c.lineWidth=8;c.beginPath();c.rect(6,6,228,188);c.fill();c.stroke();});
- const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t}));sp.scale.set(26,21.7,1);
- const im=new Image();im.onload=()=>{const c=t.image.getContext('2d');c.drawImage(im,12,12,216,176);t.needsUpdate=true;};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(e.svg);
- const k=e.c[0],y=k==='天'?CEIL-13:(k==='壁'?32:12);sp.position.set(e.h[0],y,e.h[1]);scene.add(sp);
- if(k!=='地'){const a=k==='天'?CEIL:y-11,b=k==='天'?y+11:0;const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(e.h[0],a,e.h[1]),new THREE.Vector3(e.h[0],b,e.h[1])]);
-  scene.add(new THREE.Line(g,new THREE.LineDashedMaterial({color:0x231815,dashSize:2,gapSize:2})).computeLineDistances());}
- iconS[e.n]=sp;}
+// 碰撞檢查：設備圖示、小旗子不能穿進牆或檔案架
+function rectHit(x0,x1,z0,z1,yb){return D.box.some(b=>b[4]>yb&&x1>b[0]&&x0<b[2]&&z1>b[1]&&z0<b[3]);}
+function clearAt(x,z,yb){let m=1e9;D.box.forEach(b=>{if(b[4]<=yb)return;const dx=Math.max(b[0]-x,0,x-b[2]),dz=Math.max(b[1]-z,0,z-b[3]);m=Math.min(m,Math.hypot(dx,dz));});return m;}
+function freeSpot(x,z,hw,yb){// 找離凹槽最近、四周留得下 hw 的位置；真的太窄就縮小
+ let best=null;for(let r=0;r<=24;r+=2)for(let a=0;a<16;a++){const px=x+Math.cos(a/8*Math.PI)*r,pz=z+Math.sin(a/8*Math.PI)*r;if(clearAt(px,pz,yb)>=hw+.8){best=[px,pz,1];break;}if(!r)break;}
+ if(best)return best;let m=0,bp=[x,z];for(let r=0;r<=24;r+=2)for(let a=0;a<16;a++){const px=x+Math.cos(a/8*Math.PI)*r,pz=z+Math.sin(a/8*Math.PI)*r,c=clearAt(px,pz,yb);if(c>m){m=c;bp=[px,pz];}}
+ return [bp[0],bp[1],Math.max(.55,(m-.8)/hw)];}
+function wallFace(x,z){// 最近的牆面（含方向）
+ let best=null;D.box.forEach(b=>{if(b[5]!=='w')return;const F=[[b[0],b[1],b[3],-1,'x'],[b[2],b[1],b[3],1,'x'],[b[1],b[0],b[2],-1,'z'],[b[3],b[0],b[2],1,'z']];
+  F.forEach(([c,s0,s1,n,ax])=>{const p=ax==='x'?x:z,q=ax==='x'?z:x;if((p-c)*n<0)return;const dq=Math.max(s0-q,0,q-s1),d=Math.hypot(p-c,dq);if(!best||d<best.d)best={d,c,s0,s1,n,ax};});});return best;}
+function iconTex(e){const t=canvasTex(240,200,c=>{c.fillStyle='#fffaf0';c.strokeStyle='#231815';c.lineWidth=8;c.beginPath();c.rect(6,6,228,188);c.fill();c.stroke();});
+ const im=new Image();im.onload=()=>{const c=t.image.getContext('2d');c.drawImage(im,12,12,216,176);t.needsUpdate=true;};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(e.svg);return t;}
+function iconSprite(e){// 收集後，設備出現在它真正的位置：天＝吊在天花板、壁＝貼在牆面上、地＝放在地上
+ const k=e.c[0],t=iconTex(e),W0=26,H0=21.7;let obj;
+ if(e.c.includes('壁')){const f=wallFace(e.h[0],e.h[1]);const hw=W0/2,along=Math.max(f.s0+hw+1,Math.min(f.s1-hw-1,f.ax==='x'?e.h[1]:e.h[0]));
+  obj=new THREE.Mesh(new THREE.PlaneGeometry(W0,H0),new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide}));const off=f.c+f.n*.7,y=k==='天'?CEIL-14:34;
+  if(f.ax==='x'){obj.position.set(off,y,along);obj.rotation.y=f.n>0?Math.PI/2:-Math.PI/2;}else{obj.position.set(along,y,off);obj.rotation.y=f.n>0?0:Math.PI;}
+  // 固定座：一小塊貼牆的底板
+  const pl=edge(new THREE.Mesh(new THREE.BoxGeometry(f.ax==='x'?1.2:W0+2,H0+2,f.ax==='x'?W0+2:1.2),new THREE.MeshLambertMaterial({color:0x8a8270})));pl.position.copy(obj.position);if(f.ax==='x')pl.position.x-=f.n*.35;else pl.position.z-=f.n*.35;scene.add(pl);
+  scene.add(obj);}
+ else{const y=k==='天'?CEIL-13:H0/2+1,[px,pz,sc]=freeSpot(e.h[0],e.h[1],W0/2,y-H0/2);
+  obj=new THREE.Sprite(new THREE.SpriteMaterial({map:t}));obj.scale.set(W0*sc,H0*sc,1);obj.position.set(px,k==='天'?CEIL-H0*sc/2-2:H0*sc/2+.5,pz);scene.add(obj);
+  if(k==='天'){const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(px,CEIL,pz),new THREE.Vector3(px,obj.position.y+H0*sc/2,pz)]);scene.add(new THREE.Line(g,new THREE.LineBasicMaterial({color:0x231815})));}}
+ iconS[e.n]=obj;}
+// ---------- 12 項設備的立體模型（照館方「庫房設備圖文說明」與庫房模型，裝在各自真正的位置） ----------
+const XB=[];const EQA={};let ledMats=[];
+function M(g,c,o,par){const m=edge(new THREE.Mesh(g,new THREE.MeshLambertMaterial(Object.assign({color:c},o||{}))));(par||scene).add(m);return m;}
+function rod(x,z,y0,y1,par,col){const m=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,y1-y0,4),new THREE.MeshLambertMaterial({color:col||0x5b5048}));m.position.set(x,(y0+y1)/2,z);(par||scene).add(m);return m;}
+function wallMount(x,z,y,w,h,d,mat){// 貼在最近牆面的盒子
+ const f=wallFace(x,z),along=Math.max(f.s0+w/2+1,Math.min(f.s1-w/2-1,f.ax==='x'?z:x));
+ const g=f.ax==='x'?new THREE.BoxGeometry(d,h,w):new THREE.BoxGeometry(w,h,d);const m=edge(new THREE.Mesh(g,mat));scene.add(m);
+ if(f.ax==='x')m.position.set(f.c+f.n*d/2,y,along);else m.position.set(along,y,f.c+f.n*d/2);return {m,f};}
+function faceOf(m,f,d,w,h,tex){// 在牆上盒子的正面貼一張圖
+ const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex}));p.position.copy(m.position);
+ if(f.ax==='x'){p.position.x+=f.n*(d/2+.05);p.rotation.y=f.n>0?Math.PI/2:-Math.PI/2;}else{p.position.z+=f.n*(d/2+.05);p.rotation.y=f.n>0?0:Math.PI;}scene.add(p);return p;}
+function buildEquip(){
+ ledG.clear();ductG.clear();
+ // 10 空調出風、回風管：深灰色方形風管，用吊桿吊在天花板下（沿後牆主管＋沿走道的支管）；出風口吹藍色、回風口吸粉紅色
+ {const dk=0xc9ced4;const main=M(new THREE.BoxGeometry(356,6,11),dk,null,ductG);main.position.set(202,CEIL-6,18);
+  const br=M(new THREE.BoxGeometry(8,5,180),dk,null,ductG);br.position.set(376,CEIL-6,113);
+  [40,120,200,280,360].forEach(x=>{rod(x,15,CEIL-3,CEIL,ductG);rod(x,21,CEIL-3,CEIL,ductG);});[70,140].forEach(z=>rod(376,z,CEIL-3.5,CEIL,ductG));
+  const df=M(new THREE.BoxGeometry(14,1.4,14),0xe6e2d8,null,ductG);df.position.set(376,CEIL-8.6,196);
+  const gr=new THREE.Mesh(new THREE.PlaneGeometry(11,11),new THREE.MeshBasicMaterial({map:canvasTex(64,64,c=>{c.fillStyle='#e6e2d8';c.fillRect(0,0,64,64);c.strokeStyle='#5b5048';c.lineWidth=4;for(let i=8;i<64;i+=12){c.beginPath();c.moveTo(i,4);c.lineTo(i,60);c.stroke();}})}));gr.rotation.x=Math.PI/2;gr.position.set(376,CEIL-9.4,196);ductG.add(gr);
+  const rg=new THREE.Mesh(new THREE.PlaneGeometry(16,4.5),new THREE.MeshBasicMaterial({map:canvasTex(96,28,c=>{c.fillStyle='#d8dde2';c.fillRect(0,0,96,28);c.strokeStyle='#3a3d42';c.lineWidth=3;for(let i=6;i<96;i+=8){c.beginPath();c.moveTo(i,3);c.lineTo(i,25);c.stroke();}})}));rg.position.set(150,CEIL-6,23.6);ductG.add(rg);
+  const arrow=(x,y,z,dir,col)=>{const mt=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.85});const a=new THREE.Mesh(new THREE.ConeGeometry(2.4,5,10),mt);a.position.set(x,y,z);a.rotation.x=dir==='down'?Math.PI:-Math.PI/2;ductG.add(a);
+   const s=new THREE.Mesh(new THREE.CylinderGeometry(.8,.8,5,6),mt);s.position.copy(a.position);if(dir==='down')s.position.y+=4.5;else{s.rotation.x=Math.PI/2;s.position.z+=4.5;}ductG.add(s);};
+  arrow(376,CEIL-17,196,'down',0x4aa3df);arrow(150,CEIL-6,33,'back',0xe88aa8);
+  EQA['10']=[376,CEIL-13,203];}
+ // 02 消防撒水頭：紅色水管沿天花板走，往下接到白色圓盤（在檔案架之間的上方）
+ {const red=0xc8322a;const pm=M(new THREE.CylinderGeometry(.8,.8,350,8),red,null,ductG);pm.rotation.z=Math.PI/2;pm.position.set(200,CEIL-11,30);
+  [40,140,240,340].forEach(x=>rod(x,30,CEIL-11,CEIL,ductG));
+  [66,170,326].forEach(x=>{const b=M(new THREE.CylinderGeometry(.7,.7,80,8),red,null,ductG);b.rotation.x=Math.PI/2;b.position.set(x,CEIL-11,70);
+   const d=M(new THREE.CylinderGeometry(.6,.6,4,8),red,null,ductG);d.position.set(x,CEIL-13,110);
+   const h=M(new THREE.CylinderGeometry(3.4,3.4,.5,18),0xf7f7f2,null,ductG);h.position.set(x,CEIL-15.2,110);
+   const t=M(new THREE.CylinderGeometry(.6,.6,1,8),red,null,ductG);t.position.set(x,CEIL-15.9,110);});
+  EQA['02']=[66,CEIL-23,110];}
+ // 08 無紫外線 LED 照明：吊桿吊著的長條燈具（找到後亮起）
+ {const add=(x,z,len,ax)=>{const mat=new THREE.MeshBasicMaterial({color:0xcfcbc0});ledMats.push(mat);const g=ax==='z'?new THREE.BoxGeometry(2.4,1.2,len):new THREE.BoxGeometry(len,1.2,2.4);
+   const t=edge(new THREE.Mesh(g,mat));t.position.set(x,CEIL-7,z);ledG.add(t);
+   const ends=ax==='z'?[[x,z-len*.4],[x,z+len*.4]]:[[x-len*.4,z],[x+len*.4,z]];ends.forEach(([a,b])=>rod(a,b,CEIL-6.4,CEIL,ledG,0x8a8270));};
+  for(let i=0;i<7;i++)add(40+i*52,115,100,'z');add(448,115,100,'z');[70,200,327].forEach(x=>add(x,270,90,'x'));
+  ledG.visible=true;ledG.userData.on=1;EQA['08']=[196,CEIL-14,60];}
+ ductG.visible=true;ductG.userData.on=1;
+ // 04 消防偵煙探測器：天花板上的白色圓盤（整理區）
+ {const [x,z]=[26,255];const s=M(new THREE.CylinderGeometry(4.6,5.4,2.2,20),0xf7f7f2,null,ductG);s.position.set(x,CEIL-1.1,z);const r=M(new THREE.CylinderGeometry(3.4,3.4,.8,20),0xe6e2d8,null,ductG);r.position.set(x,CEIL-2.6,z);EQA['04']=[x,CEIL-10,z];}
+ // 01 錄影監視設備：牆上支架＋白色攝影機，鏡頭朝庫房裡面
+ {const f=wallFace(24,24);const g=new THREE.Group();M(new THREE.BoxGeometry(4,4,1.2),0xd9d6cf,null,g).position.set(0,0,.6);
+  const arm=M(new THREE.CylinderGeometry(.6,.6,6,8),0xd9d6cf,null,g);arm.rotation.x=Math.PI/2;arm.position.set(0,0,3.6);
+  const hs=new THREE.Group();hs.position.set(0,-1.5,7);hs.rotation.y=0.75;hs.rotation.x=0.3;g.add(hs);
+  M(new THREE.BoxGeometry(5,4.4,12),0xf2f0ea,null,hs).position.z=3;M(new THREE.BoxGeometry(6,.6,13.5),0xf2f0ea,null,hs).position.set(0,2.6,3.4);
+  const lens=M(new THREE.CylinderGeometry(1.7,1.7,.6,14),0x231815,null,hs);lens.rotation.x=Math.PI/2;lens.position.z=9.1;
+  g.position.set(30,44,f.c);scene.add(g);EQA['01']=[38,50,22];}
+ // 05 通訊設備：整理區門邊牆上的黑色門禁對講機（螢幕＋按鍵）
+ {const {m,f}=wallMount(240,236,28,6.5,10,1.6,new THREE.MeshLambertMaterial({color:0x26282c}));
+  faceOf(m,f,1.6,5.6,9,canvasTex(56,90,c=>{c.fillStyle='#26282c';c.fillRect(0,0,56,90);c.fillStyle='#9fc9b8';c.fillRect(8,10,40,12);c.fillStyle='#e6e2d8';c.font='700 9px sans-serif';c.textAlign='center';
+   let k=1;for(let r=0;r<4;r++)for(let q=0;q<3;q++){c.fillText(r===3?['*','0','#'][q]:String(k++),12+q*16,38+r*13);}c.strokeStyle='#e6e2d8';c.lineWidth=1.5;c.strokeRect(36,80,12,7);}));
+  EQA['05']=[m.position.x-4,40,m.position.z];}
+ // 06 手提滅火器：不鏽鋼瓶身、螢光綠瓶蓋和底座、綠色標籤，放在牆邊地上
+ {const [x,z]=[382,94];M(new THREE.CylinderGeometry(3,3,12,18),0xc9ccd0).position.set(x,8,z);
+  const lb=new THREE.Mesh(new THREE.CylinderGeometry(3.05,3.05,6,18,1,true),new THREE.MeshLambertMaterial({map:canvasTex(128,48,q=>{q.fillStyle='#e9f5ea';q.fillRect(0,0,128,48);q.fillStyle='#3a9a4a';q.fillRect(0,0,128,10);q.fillRect(0,38,128,10);[['#f3e03b',30],['#4aa3df',64],['#c8322a',98]].forEach(([col,cx])=>{q.fillStyle=col;q.beginPath();q.arc(cx,24,8,0,7);q.fill();});})}));lb.position.set(x,8,z);scene.add(lb);
+  M(new THREE.CylinderGeometry(3.1,3.1,2,18),0xc6e83c).position.set(x,1,z);M(new THREE.CylinderGeometry(2.2,3,2,18),0xc6e83c).position.set(x,15,z);
+  M(new THREE.CylinderGeometry(.9,.9,2,8),0xb8bcc0).position.set(x,17,z);const hd=M(new THREE.BoxGeometry(5,.8,1),0xb8bcc0);hd.position.set(x-1.5,18.3,z);hd.rotation.z=.2;
+  const nz=M(new THREE.CylinderGeometry(.5,.5,3,6),0x231815);nz.rotation.z=Math.PI/2;nz.position.set(x-2.6,17,z);
+  XB.push([x-3.4,z-3.4,x+3.4,z+3.4,19]);EQA['06']=[x,26,z];}
+ // 07 溫濕度感應器：牆上的白色盒子＋綠色液晶螢幕
+ {const {m,f}=wallMount(372,24,32,6,9,2,new THREE.MeshLambertMaterial({color:0xe9e9e6}));
+  faceOf(m,f,2,5.6,8.6,canvasTex(60,92,c=>{c.fillStyle='#e9e9e6';c.fillRect(0,0,60,92);c.fillStyle='#7ee08a';c.fillRect(8,10,44,30);c.fillStyle='#1d4d22';c.font='700 11px "IBM Plex Sans",sans-serif';c.textAlign='center';c.fillText('23.4°C',30,24);c.fillText('50%RH',30,36);
+   c.fillStyle='#8a8a86';for(let a=0;a<8;a++){c.beginPath();c.arc(30+Math.cos(a*.785)*9,70+Math.sin(a*.785)*9,1.4,0,7);c.fill();}}));
+  EQA['07']=[m.position.x,42,m.position.z+3];}
+ // 09 防火門（2 小時防火時效）：灰色門框＋一扇打開 90 度的灰色門（有推桿），開向前室
+ {const gy=0x9a9da0;M(new THREE.BoxGeometry(7,46,3),gy).position.set(263,23,251.5);M(new THREE.BoxGeometry(7,46,3),gy).position.set(263,23,303.5);M(new THREE.BoxGeometry(7,6,55),gy).position.set(263,49,277.5);
+  M(new THREE.BoxGeometry(52,44,1.8),0xb4b7ba).position.set(292.5,22,251.6);
+  const bar=M(new THREE.CylinderGeometry(.6,.6,34,8),0x6d7074);bar.rotation.z=Math.PI/2;bar.position.set(296,20,253.6);[281,311].forEach(x=>M(new THREE.BoxGeometry(1.4,2,1.6),0x6d7074).position.set(x,20,252.9));
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(12,6),new THREE.MeshBasicMaterial({map:canvasTex(160,80,c=>{c.fillStyle='#fff';c.fillRect(0,0,160,80);c.strokeStyle='#231815';c.lineWidth=6;c.strokeRect(3,3,154,74);c.fillStyle='#c8322a';c.font='900 34px "Noto Sans TC",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('防火門 2h',80,42);})}));
+  sign.position.set(300,33,252.55);scene.add(sign);XB.push([266,250.5,318.5,254.3,44]);EQA['09']=[263,58,277];}
+ // 11 檔案運輸車：灰色鐵架、兩層斜放的檔案層板、四個輪子
+ {const [x,z]=[214,302],gc=0xb4b8bc,sh=0xe6e2d8;
+  [[-10,-5.5],[10,-5.5],[-10,5.5],[10,5.5]].forEach(([a,b])=>{const w=M(new THREE.CylinderGeometry(1.4,1.4,1.2,10),0x231815);w.rotation.x=Math.PI/2;w.position.set(x+a,1.4,z+b);});
+  [-10,10].forEach(a=>M(new THREE.BoxGeometry(1,20,12),gc).position.set(x+a,13,z));
+  M(new THREE.BoxGeometry(20,1,11),gc).position.set(x,4,z);
+  [9,17].forEach(y=>{const s=M(new THREE.BoxGeometry(19,.8,11),sh);s.position.set(x,y,z);s.rotation.x=.35;
+   [-6,0,6].forEach((o,i)=>{const bx2=M(new THREE.BoxGeometry(4.5,6,1.4),[0xefdcb4,0xe8d2a6,0xf2f0ea][i]);bx2.position.set(x+o,y+3.2,z-2);bx2.rotation.x=.35;});});
+  XB.push([x-11,z-6.5,x+11,z+6.5,24]);EQA['11']=[x,30,z];}
+ EQA['03']=[274,52,115];EQA['12']=[230,8,200];}
+function markEquip(e){// 找到後：模型上方出現 ✓ 編號
+ const a=EQA[e.n];if(!a)return;const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(128,64,c=>{c.fillStyle='#f3e03b';c.fillRect(0,0,128,64);c.lineWidth=8;c.strokeStyle='#231815';c.strokeRect(4,4,120,56);c.fillStyle='#231815';c.font='900 40px "IBM Plex Sans",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('✓'+e.n,64,34);}),depthTest:false}));
+ sp.scale.set(14,7,1);sp.position.set(a[0],a[1]+5,a[2]);sp.renderOrder=5;scene.add(sp);iconS[e.n]=sp;
+ if(e.n==='08')ledMats.forEach(m=>m.color.set(0xfffff2));}
 function resize(){if(!rd)return;const w=host.clientWidth,h=host.clientHeight;rd.setSize(w,h,false);const a=w/h;cam3.aspect=a;cam3.updateProjectionMatrix();
  // 平面：整個盤面放得下
  let hw=W/2+12,hh=H/2+12;if(hw/hh<a)hw=hh*a;else hh=hw/a;Object.assign(camP,{left:-hw,right:hw,top:hh,bottom:-hh});camP.position.set(W/2,600,H/2);camP.up.set(0,0,-1);camP.lookAt(W/2,0,H/2);camP.updateProjectionMatrix();
@@ -335,7 +436,7 @@ function bindPtr(el,map){el.addEventListener('pointerdown',e=>{pt=map(e);el.setP
  ['pointerup','pointercancel'].forEach(t=>el.addEventListener(t,()=>{pt=null;}));}
 bindPtr($('#plan'),e=>{const r=$('#plan').getBoundingClientRect();return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H];});
 const kd=e=>{if(run&&e.key.startsWith('Arrow')){keys[e.key]=e.type==='keydown';e.preventDefault();}};window.addEventListener('keydown',kd);window.addEventListener('keyup',kd);
-function hit(nx,ny){D.box.forEach(b=>{const qx=Math.max(b[0],Math.min(nx,b[2])),qy=Math.max(b[1],Math.min(ny,b[3])),dx=nx-qx,dy=ny-qy;if(dx*dx+dy*dy<R*R){
+function hit(nx,ny){D.box.concat(XB).forEach(b=>{const qx=Math.max(b[0],Math.min(nx,b[2])),qy=Math.max(b[1],Math.min(ny,b[3])),dx=nx-qx,dy=ny-qy;if(dx*dx+dy*dy<R*R){
   if(Math.abs(dx)>Math.abs(dy)){nx=qx+(dx>=0?R:-R);vx*=-.35;}else{ny=qy+(dy>=0?R:-R);vy*=-.35;}}});return [nx,ny];}
 function step(t){if(!run)return;const dt=Math.min(32,t-last)/16;last=t;
  let fx=ax,fy=ay;if(keys.ArrowLeft)fx=-1;if(keys.ArrowRight)fx=1;if(keys.ArrowUp)fy=-1;if(keys.ArrowDown)fy=1;
@@ -345,10 +446,10 @@ function step(t){if(!run)return;const dt=Math.min(32,t-last)/16;last=t;
  for(let i=0;i<3;i++){let nx=bx+vx*dt/3,ny=by+vy*dt/3;[nx,ny]=hit(nx,ny);bx=Math.max(R,Math.min(W-R,nx));by=Math.max(R,Math.min(H-R,ny));}
  D.eq.forEach(e=>{if(got.has(e.n))return;if(Math.hypot(bx-e.h[0],by-e.h[1])<8){got.add(e.n);vx*=.15;vy*=.15;collect(e);}});
  render();drawPlan();requestAnimationFrame(step);}
-function collect(e){$('#g'+e.n).classList.add('on');holeM[e.n].material.color.set(0xf3e03b);iconSprite(e);
+function collect(e){$('#g'+e.n).classList.add('on');holeM[e.n].material.color.set(0xf3e03b);markEquip(e);
  if(e.n==='12'){paintFloor(floorM.map.image.getContext('2d'),true);floorM.map.needsUpdate=true;}
  if(e.n==='08'){ledG.userData.on=1;amb.intensity=.66;}if(e.n==='10')ductG.userData.on=1;if(e.n==='03')slideT=performance.now();
- const cs=[...e.c],xtra={'12':'看！地板變成橘紅色的環氧樹脂地坪：耐磨、不起灰塵。','08':'天花板的燈管亮起來了，無紫外線，不會傷害檔案。','10':'天花板出現空調出風、回風管，24 小時控制溫濕度。','03':'密集式檔案架：轉動黑色轉輪，櫃子就會沿著地上的軌道移動。'}[e.n]||'';
+ const cs=[...e.c],xtra={'12':'看！地板變成粉橘紅色的環氧樹脂地坪：耐磨、不起灰塵。','08':'天花板吊著的燈管亮起來了：無紫外線，不會傷害檔案。','10':'抬頭看！天花板下淺灰色的方管就是空調風管：藍色箭頭是出風口吹出的空氣，粉紅箭頭是回風口吸回去的空氣，24 小時控制溫濕度。','03':'密集式檔案架：轉動黑色轉輪，櫃子就會沿著地上的軌道移動。'}[e.n]||'';
  $('#pop').innerHTML=`<span class="e">${e.svg}</span><div><b>${e.n}　${e.zh}</b><br>${cs.map(c=>`<span class="chip" style="background:${CAT[c][0]};color:${CAT[c][1]}">${c}</span>`).join('')}<small>裝在${cs.map(c=>CAT[c][2]).join('、')}${cs[0]==='天'?'，抬頭才看得到':(cs[0]==='壁'?'，固定在牆面上':'，放在地上')}${xtra?'<br>'+xtra:''}</small></div>`;
  coach('good',`找到第 ${got.size} 項：<b>${e.zh}</b>！它出現在${cs.map(c=>CAT[c][2]).join('和')}。${got.size===3?'切到<b>立面視角</b>看看，設備裝多高一看就懂。':''}`,'good');
  if(window.ARCHI)ARCHI.log('eq',{n:e.n});if(got.size===12)setTimeout(finish,700);}
