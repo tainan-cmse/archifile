@@ -138,9 +138,12 @@ h1,h2,h3,.stamp,.titleblock h1{font-family:var(--round);font-weight:400!importan
 .apply .tagk{display:inline-block;background:var(--ink);color:var(--yellow);font-weight:900;padding:0 8px;margin-bottom:4px;letter-spacing:.08em}
 .pool{display:flex;flex-wrap:wrap;gap:8px}
 .order{display:flex;flex-direction:column;gap:8px;counter-reset:o}
-.order .slot{border:2.5px dashed var(--ink);padding:6px 12px;min-height:40px;font-weight:900;background:#fff;display:flex;align-items:center;gap:10px}
-.order .slot::before{counter-increment:o;content:counter(o);width:26px;height:26px;border-radius:50%;background:var(--grey);color:#fff;display:grid;place-items:center;font-family:var(--en);font-size:14px;flex:none}
-.order .cslot.on{border-style:solid;background:var(--yellow)} .order .slot.on::before{background:var(--red)}
+.order .oslot{border:2.5px dashed var(--ink);padding:6px 12px;min-height:40px;font-weight:900;background:#fff;display:flex;align-items:center;gap:10px;writing-mode:horizontal-tb;transition:background .25s,border-color .25s}
+.order .oslot::before{counter-increment:o;content:counter(o);width:26px;height:26px;border-radius:50%;background:var(--grey);color:#fff;display:grid;place-items:center;font-family:var(--en);font-size:14px;flex:none;transform:none;writing-mode:horizontal-tb}
+.order .oslot.next{border-color:var(--red);background:#fff4d6} .order .oslot.next::before{background:var(--ink)}
+.order .oslot.on{border-style:solid;background:var(--yellow);box-shadow:3px 3px 0 var(--ink);animation:pop .35s ease-out} .order .oslot.on::before{background:var(--red)}
+.pool .btn.bad{background:var(--red);color:#fff}
+@keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.03)}100%{transform:none}}
 /* 冷凍 */
 .fz{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:16px;align-items:center}
 @media(max-width:560px){.fz{grid-template-columns:1fr}}
@@ -336,10 +339,10 @@ function L1(){let k=0,round=1;
  coach('idle',`入住選手村之前，要先「全身淨化」！檔案裡可能藏著蟲卵，你的<b>${MQ.a}</b>也一樣。先照順序把它送進冷凍櫃。`);
  ST.innerHTML=`<h2><small>第 1 關・之一</small>訓練第一步：冷凍檢疫法</h2>
   <p class="text">檔案入庫前要先<b>除蟲</b>，常用的有燻蒸法和低溫法。這裡用的是<b>低溫法</b>。</p>
-  <div class="order">${D.freeze.map((_,i)=>`<div class="slot" id="o${i}"></div>`).join('')}</div>
+  <div class="order">${D.freeze.map((_,i)=>`<div class="oslot${i?'':' next'}" id="o${i}"></div>`).join('')}</div>
   <div class="pool">${shuffle(D.freeze.map((s,i)=>({s,i}))).map(p=>`<button class="btn" data-i="${p.i}">${p.s}</button>`).join('')}</div>`;
- $$('.pool .btn').forEach(b=>b.onclick=()=>{if(+b.dataset.i!==k){shake(b);coach('miss','順序不對！想想看：沒有包好就放進去，會發生什麼事？','bad');return;}
-  $('#o'+k).textContent=D.freeze[k];$('#o'+k).classList.add('on');b.hidden=true;k++;
+ $$('.pool .btn').forEach(b=>b.onclick=()=>{if(+b.dataset.i!==k){shake(b);b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),600);coach('miss','順序不對！想想看：沒有包好就放進去，會發生什麼事？','bad');return;}
+  $('#o'+k).textContent=D.freeze[k];$('#o'+k).classList.remove('next');$('#o'+k).classList.add('on');b.hidden=true;k++;if(k<3)$('#o'+k).classList.add('next');
   if(k<3)coach('good',['先把檔案裝進箱子。','用塑膠袋密封，冷凍時才不會受潮。'][k-1],'good');else{coach('good','放進冷凍櫃了！接下來要設定溫度。','good');setTimeout(dial,800);}});
  function dial(){let d=0,warm=0;
   ST.innerHTML=`<h2><small>第 1 關・第 ${round} 回合</small>把溫度調到攝氏零下 20 度至零下 30 度</h2>
